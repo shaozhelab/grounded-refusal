@@ -274,6 +274,25 @@ from their rows, and every `negative_type` matches what `build_preference.py` wo
 31, which is the concentration issue #19 describes. `v3c` is a control for reading the `v3b` result,
 not a replacement for `v3b` as the current recipe.
 
+## Ablation subsets of `preference_v3c_train.jsonl`
+
+Two files that each drop 20 pairs from `preference_v3c_train.jsonl`. They test whether what DPO
+changes on answerable rows depends on the 20 `over_complete` pairs. They are subsets, not a new
+version: no pair's content changes, and SFT still uses `data_v3c_train.jsonl`.
+
+| File | Pairs | Removed |
+|---|---:|---|
+| [`data/preference_v3c_train_no_over_complete.jsonl`](../data/preference_v3c_train_no_over_complete.jsonl) | 652 | All 20 pairs with `negative_type: over_complete` |
+| [`data/preference_v3c_train_no_random20.jsonl`](../data/preference_v3c_train_no_random20.jsonl) | 652 | 20 pairs drawn at random from the other 652 (`random.Random(0).sample`), as the control for "20 fewer pairs" |
+
+Row order is kept. The removed ids:
+
+- `no_over_complete`: `pref_0205`, `pref_0208`, `pref_0458`, `pref_0459`, `pref_0461` to `pref_0467`,
+  `pref_0469` to `pref_0477`.
+- `no_random20`: `pref_0232`, `pref_0256`, `pref_0284`, `pref_0290`, `pref_0299`, `pref_0338`,
+  `pref_0347`, `pref_0508`, `pref_0557`, `pref_0582`, `pref_0592`, `pref_0624`, `pref_0680`,
+  `pref_0719`, `pref_0728`, `pref_0747`, `pref_0754`, `pref_0776`, `pref_0828`, `pref_0864`.
+
 ## Quick answer: "which file do I use"
 
 | Task | File |
