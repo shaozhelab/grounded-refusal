@@ -3,19 +3,14 @@
 ## Background
 
 The model answers a question from a passage of evidence and nothing else. Each row of the data is
-one question with its evidence, and its label fixes the behavior expected of the model:
-
-| Label | The evidence contains | Expected behavior |
-|---|---|---|
-| `answerable` | The answer | Give it |
-| `unanswerable` | No answer | Refuse |
-| `partial` | The answer to one part of the question | Answer that part and state that the rest is not given |
-
-Training has two stages. SFT fine-tunes the base model on each row's reference response. DPO
-continues from the SFT model on *preference pairs*, each a row with a preferred response and a
-rejected one, and is meant to remove the errors SFT leaves: answering without support, and refusing
-what the evidence answers. Every model is evaluated on one held-out set of 120 rows that no model
-trains on: 60 answerable, 41 unanswerable, 19 partial.
+one question with its evidence and a label that fixes the expected behavior: give the answer when
+the evidence contains it (`answerable`), refuse when it does not (`unanswerable`), and answer the
+supported part while stating that the rest is not given when the evidence covers only part of the
+question (`partial`). Training has two stages. SFT fine-tunes the base model on each row's
+reference response. DPO continues from the SFT model on *preference pairs*, each a row with a
+preferred response and a rejected one, and is meant to remove the errors SFT leaves: answering
+without support, and refusing what the evidence answers. Every model is evaluated on one held-out
+set of 120 rows that no model trains on: 60 answerable, 41 unanswerable, 19 partial.
 
 ## Summary
 
@@ -34,15 +29,25 @@ each of the three:
    in all, so that a difference between the two can be distinguished from the variation between
    runs.
 
-On every measure of correctness the result is null: DPO matches SFT to within one row out of 120 in
-correct answers, correct refusals and partial handling. DPO does change the form of the response.
-After a correct answer it more often appends a sentence about evidence it did not use, on 22 of 60
-answerable rows against 12 for SFT. Most of these sentences are true and leave every score
-unchanged. A minority assert that the evidence omits something it states. That error is not new:
-Weeks 5 and 7 recorded it in the base model and in earlier SFT and DPO models, first as something
-the judge failed to catch and then as a count merged into the hallucination rate. This period
-isolates it as an outcome of its own and shows that DPO raises it. A controlled experiment rejected
-the most direct explanation for the increase; its cause remains open.
+**DPO does not make the model more correct.** SFT and DPO models give the same number of correct
+answers, correct refusals and correctly handled partial questions, to within one row out of 120.
+
+**DPO makes the model say more.** After a correct answer, a DPO model often adds one more sentence
+about a part of the evidence the question did not ask about. It does so on 22 of the 60 answerable
+rows, where an SFT model does so on 12. The added sentence is usually true.
+
+**Sometimes the added sentence is false, in one specific way:** the model says the evidence does
+not mention something that it does mention. In one case the evidence describes a monitoring
+system, the question does not ask about it, and the model answers correctly and then adds that the
+monitoring system "isn't mentioned".
+
+**This false statement is an old error.** The base model already made it in Week 5, and earlier
+fine-tuned models made it in Week 7. Two things are new. It can now be counted on its own, because
+the correctness metric separates a right answer followed by a false statement from a wrong answer.
+And the four-seed comparison shows that DPO makes it more frequent.
+
+**Why DPO has this effect is not known.** One explanation, that DPO learns it from 20 particular
+preference pairs, was tested and ruled out.
 
 ## Development
 
@@ -55,7 +60,7 @@ the most direct explanation for the increase; its cause remains open.
 | Comparison | `--seed` for both training scripts; 12 models under seeds 44, 45, 46 | [`train_sft.py`](../../src/grounded_refusal/train/train_sft.py), [`train_dpo.py`](../../src/grounded_refusal/train/train_dpo.py), [`checkpoints/README.md`](../../checkpoints/README.md) | [#23](https://github.com/stxxllbu/grounded-refusal/pull/23) |
 | Controlled experiment | Two reduced preference sets and 8 DPO models, kept on a branch | Branch `ablation/dpo-over-complete` | [#24](https://github.com/stxxllbu/grounded-refusal/pull/24), draft, not for merge |
 
-## Three corrections to the training data
+## 1. Three corrections to the training data
 
 Each version repairs one defect and is judged by its effect on the held-out set.
 [`DATA_VERSIONS.md`](../DATA_VERSIONS.md) holds the full record.
@@ -111,7 +116,7 @@ few for the model to extract the behavior they have in common. The remedy has a 
 answers now follow one template, the concentration that [issue
 #19](https://github.com/stxxllbu/grounded-refusal/issues/19) describes.
 
-## Scoring whether an answer is right, not only whether it is supported
+## 2. Scoring whether an answer is right, not only whether it is supported
 
 ### What the existing judge leaves undecided
 
@@ -133,6 +138,7 @@ separate call, that decides whether a response gives the same answer as the refe
 | It runs on `answerable` and `partial` rows only | An `unanswerable` row has no reference answer. This leaves 79 of the 120 rows |
 | On a `partial` row it compares the supported part only | The reference declines the other part, so there is nothing to match |
 | Its verdict is reduced to correct or not correct | It did not separate a different answer from no answer consistently across repeated runs |
+| It was validated on 64 hand-labeled held-out responses | 44 were used while its prompt was written and 20 withheld until the prompt was frozen. It agreed with all 20. One person made the labels, which are not in the repository |
 
 **Answer accuracy** is the number of the 79 rows answered correctly. Combined with the first judge,
 each response on those rows falls into one of five outcomes:
@@ -146,13 +152,9 @@ each response on those rows falls into one of five outcomes:
 | `refused` | No answer |
 
 The earlier hallucination rate counted the second and fourth outcomes as one and did not count the
-third. Separating them is what makes the result of the fourth section measurable.
+third. Separating them is what makes the result of section 4 measurable.
 
-The judge was validated against hand labels on 64 held-out responses, 44 used while its prompt was
-written and 20 withheld until the prompt was frozen. It agreed with all 20. The labels come from
-one person and are not in the repository.
-
-## Comparing SFT and DPO across four seeds
+## 3. Comparing SFT and DPO across four seeds
 
 ### Why one run per model is not a comparison
 
@@ -196,12 +198,10 @@ partial rows the two versions differ by one response in 56, so the corrected beh
 at no cost elsewhere. `v3c` also refuses answerable rows more often than `v3a`, 3.0 against 1.3,
 which was not investigated.
 
-**The residual errors do not vary across models.** Five rows produce most of them. `ex_0137` is
-answered wrongly by all 16 models, which obey the embedded note, and `ex_0109` by 15, which compute
-400 plus 500 where the evidence gives -400 plus 500. On `ex_0092`, `ex_0098` and `ex_0133` nearly
-every model disagrees with the reference, but the reference is itself contestable on these three
-and they were not relabeled. Neither additional seeds nor DPO moves any of the five, which
-indicates errors fixed by the row and not by the training run.
+**The residual errors do not vary across models.** Five rows produce most of them, and at least
+14 of the 16 models fail each one. Two are model errors, `ex_0137` and `ex_0109`. On the other
+three, `ex_0092`, `ex_0098` and `ex_0133`, the reference answer is itself contestable. The errors
+are fixed by the row and not by the training run.
 
 **One outcome separates the two methods.** Mean rows per model, of 79:
 
@@ -217,7 +217,7 @@ indicates errors fixed by the row and not by the training run.
 doubles on average. Since answer accuracy is unchanged, DPO converts correct and faithful responses
 into correct and unfaithful ones: the answer survives and something unsupported is attached to it.
 
-## What DPO changes: a sentence appended to correct answers
+## 4. What DPO changes: a sentence appended to correct answers
 
 ### The behavior
 
@@ -323,9 +323,7 @@ no spare detail. The rows that do pair such evidence with spare detail are parti
 answers end in "is not mentioned". The model appears to borrow that ending. One false absence
 claim, on `ex_0122`, occurs on evidence that contradicts nothing, so the account is incomplete.
 
-## Testing one explanation: the `over_complete` pairs
-
-### Hypothesis
+## 5. Testing one explanation: the `over_complete` pairs
 
 Twenty preference pairs, of the type named `over_complete`, have a preferred response ending in
 "... is not mentioned", and in 19 of them the evidence contradicts common knowledge. They are the
@@ -333,14 +331,10 @@ partial rows described above, and they carry both properties of the rows on whic
 claims occur. If DPO acquires the claim from identifiable pairs, removing these twenty should
 remove it.
 
-### Design
-
-DPO was retrained on two subsets of the 672 pairs, each of 652. One omits the twenty
-`over_complete` pairs. The other omits twenty pairs drawn at random, as a control that separates
-the effect of these particular pairs from the effect of training on fewer. Each subset was trained
-under all four seeds from the `v3c` SFT model of that seed.
-
-### Result
+DPO was retrained on two subsets of the 672 pairs. One omits the twenty `over_complete` pairs. The
+other omits twenty pairs drawn at random, as a control that separates the effect of these
+particular pairs from the effect of training on fewer. Each subset was trained under all four
+seeds from the `v3c` SFT model of that seed.
 
 | | SFT | DPO, all 672 pairs | DPO, no `over_complete` | DPO, 20 random pairs removed |
 |---|---:|---:|---:|---:|
@@ -349,11 +343,9 @@ under all four seeds from the `v3c` SFT model of that seed.
 | Rows answered correctly, mean, of 79 | 70.8 | 71.0 | 71.0 | 70.0 |
 
 The hypothesis is rejected. Removing the `over_complete` pairs cannot be distinguished from
-removing twenty random pairs, and both arms reproduce the full-data DPO models; the three DPO
-models that share an SFT model give nearly identical responses. The behavior is a property of the
-DPO stage as a whole and does not depend on these pairs.
-
-The data and results are on the branch `ablation/dpo-over-complete`, recorded in [draft PR
+removing twenty random pairs, and both reproduce the full-data DPO models. The behavior is a
+property of the DPO stage as a whole and does not depend on these pairs. The data and results are
+on the branch `ablation/dpo-over-complete`, recorded in [draft PR
 #24](https://github.com/stxxllbu/grounded-refusal/pull/24), and are deliberately kept out of
 `main`.
 
@@ -372,25 +364,18 @@ The data and results are on the branch `ablation/dpo-over-complete`, recorded in
 
 ## How to run
 
-Everything from the repository root. Training and inference need the GPU; judging needs
-`OPENAI_API_KEY`.
+Training, inference and judging use the commands in [Week 7](week7.md#how-to-run), with the data
+files of this period and two new options:
 
 ```bash
-# SFT, then DPO, for one data version and seed
+# --seed on both training scripts
 python -m grounded_refusal.train.train_sft --data data/data_v3c_train.jsonl --seed 44
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train.jsonl \
   --sft-adapter checkpoints/<sft-run> --seed 44
 
-# Inference on the held-out set
-python -m grounded_refusal.inference.run_inference --data data/data_v3b_heldout.jsonl \
-  --adapter checkpoints/<run> \
-  --output outputs/inference-qwen2.5-3b-instruct-dpo/<run>_v3b_heldout.jsonl
-
-# Both judges
-python -m grounded_refusal.eval.run_eval \
-  --input outputs/inference-qwen2.5-3b-instruct-dpo/<run>_v3b_heldout.jsonl \
-  --output outputs/eval-qwen2.5-3b-instruct-dpo/<run>_v3b_heldout_eval_judge-gpt5-mini.jsonl \
-  --correctness-output outputs/eval-qwen2.5-3b-instruct-dpo/<run>_v3b_heldout_correctness_judge-gpt5-mini.jsonl
+# --correctness-output on run_eval runs the second judge
+python -m grounded_refusal.eval.run_eval --input <inference.jsonl> --output <judge.jsonl> \
+  --correctness-output <correctness.jsonl>
 ```
 
 `run_eval.py` prints the metrics of one model. The means over seeds and the count of trailing
@@ -400,8 +385,8 @@ sentences come from one-off scripts that are not in the repository.
 
 Three questions are open, in the order the results raise them:
 
-- **Does the bare one-sentence answer drive the trailing sentence?** The hypothesis of the fourth
-  section predicts that DPO lowers the probability of ending the response after the answer, and
+- **Does the bare one-sentence answer drive the trailing sentence?** The hypothesis of section
+  4 predicts that DPO lowers the probability of ending the response after the answer, and
   that the drop is largest where the evidence contains unused material. Both can be measured on the
   existing models without training.
 - **Under what conditions is a trailing sentence false?** Six rows are too few to separate the two
