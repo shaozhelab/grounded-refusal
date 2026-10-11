@@ -65,6 +65,8 @@ python -m grounded_refusal.eval.run_eval \
 | 4 | SFT training pipeline | **pipeline built + smoke-test run** | [`docs/reports/week4.md`](docs/reports/week4.md) |
 | 5 | Judge validation + `data_v2` extension | **judge switched to gpt-5-mini**; `data_v2` extended to 600 rows | [`docs/reports/week5.md`](docs/reports/week5.md) |
 | 6 | `data_v2` split, SFT retrain, DPO pipeline | **SFT retrained on `data_v2_train`**; DPO script written, not yet run | [`docs/reports/week6.md`](docs/reports/week6.md) |
+| 7 | First DPO run; base / SFT / DPO on held-out | **DPO trained and evaluated**; not better than SFT on `data_v2_heldout` | [`docs/reports/week7.md`](docs/reports/week7.md) |
+| 8 | `data_v3`, answer correctness, seed replication | **16 models evaluated**; DPO leaves accuracy unchanged and adds remarks to answerable rows | [`docs/reports/week8.md`](docs/reports/week8.md) |
 
 ## Quick data pointers
 
