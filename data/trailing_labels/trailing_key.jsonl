@@ -1,0 +1,210 @@
+{"item": "t001", "id": "ex_0098", "models": [{"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 42}, {"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t002", "id": "ex_0143", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t003", "id": "ex_0118", "models": [{"version": "v3a", "method": "sft", "seed": 42}]}
+{"item": "t004", "id": "ex_0135", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t005", "id": "ex_0098", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t006", "id": "ex_0140", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t007", "id": "ex_0143", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t008", "id": "ex_0136", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t009", "id": "ex_0143", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t010", "id": "ex_0125", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t011", "id": "ex_0092", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t012", "id": "ex_0143", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t013", "id": "ex_0098", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t014", "id": "ex_0137", "models": [{"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t015", "id": "ex_0107", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t016", "id": "ex_0093", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t017", "id": "ex_0143", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t018", "id": "ex_0098", "models": [{"version": "v3a", "method": "sft", "seed": 42}]}
+{"item": "t019", "id": "ex_0136", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t020", "id": "ex_0124", "models": [{"version": "v3a", "method": "sft", "seed": 45}, {"version": "v3c", "method": "sft", "seed": 45}, {"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t021", "id": "ex_0122", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t022", "id": "ex_0120", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t023", "id": "ex_0133", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t024", "id": "ex_0094", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t025", "id": "ex_0109", "models": [{"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t026", "id": "ex_0139", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t027", "id": "ex_0093", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t028", "id": "ex_0118", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t029", "id": "ex_0140", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t030", "id": "ex_0118", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t031", "id": "ex_0109", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t032", "id": "ex_0097", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t033", "id": "ex_0092", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t034", "id": "ex_0137", "models": [{"version": "v3a", "method": "sft", "seed": 42}, {"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t035", "id": "ex_0118", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t036", "id": "ex_0120", "models": [{"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t037", "id": "ex_0139", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t038", "id": "ex_0125", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t039", "id": "ex_0091", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t040", "id": "ex_0123", "models": [{"version": "v3a", "method": "dpo", "seed": 42}, {"version": "v3a", "method": "dpo", "seed": 45}, {"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t041", "id": "ex_0112", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t042", "id": "ex_0098", "models": [{"version": "v3a", "method": "sft", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t043", "id": "ex_0193", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t044", "id": "ex_0092", "models": [{"version": "v3a", "method": "sft", "seed": 46}, {"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t045", "id": "ex_0118", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t046", "id": "ex_0124", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t047", "id": "ex_0118", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t048", "id": "ex_0122", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t049", "id": "ex_0122", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t050", "id": "ex_0091", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t051", "id": "ex_0107", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t052", "id": "ex_0125", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t053", "id": "ex_0125", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t054", "id": "ex_0351", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t055", "id": "ex_0109", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t056", "id": "ex_0138", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t057", "id": "ex_0141", "models": [{"version": "v3a", "method": "dpo", "seed": 42}, {"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 45}, {"version": "v3a", "method": "dpo", "seed": 46}, {"version": "v3c", "method": "dpo", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t058", "id": "ex_0125", "models": [{"version": "v3a", "method": "dpo", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t059", "id": "ex_0118", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t060", "id": "ex_0097", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t061", "id": "ex_0109", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t062", "id": "ex_0098", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t063", "id": "ex_0120", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t064", "id": "ex_0137", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t065", "id": "ex_0091", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t066", "id": "ex_0091", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t067", "id": "ex_0118", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t068", "id": "ex_0139", "models": [{"version": "v3a", "method": "dpo", "seed": 42}, {"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 45}, {"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t069", "id": "ex_0092", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t070", "id": "ex_0091", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t071", "id": "ex_0106", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t072", "id": "ex_0125", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t073", "id": "ex_0092", "models": [{"version": "v3a", "method": "sft", "seed": 42}, {"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t074", "id": "ex_0122", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t075", "id": "ex_0093", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t076", "id": "ex_0351", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t077", "id": "ex_0094", "models": [{"version": "v3c", "method": "dpo", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t078", "id": "ex_0091", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t079", "id": "ex_0124", "models": [{"version": "v3c", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t080", "id": "ex_0135", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t081", "id": "ex_0098", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t082", "id": "ex_0137", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t083", "id": "ex_0120", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t084", "id": "ex_0135", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t085", "id": "ex_0092", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t086", "id": "ex_0137", "models": [{"version": "v3a", "method": "sft", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3a", "method": "sft", "seed": 45}, {"version": "v3a", "method": "dpo", "seed": 45}, {"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t087", "id": "ex_0098", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t088", "id": "ex_0120", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t089", "id": "ex_0098", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t090", "id": "ex_0114", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t091", "id": "ex_0122", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t092", "id": "ex_0108", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t093", "id": "ex_0107", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t094", "id": "ex_0118", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t095", "id": "ex_0122", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t096", "id": "ex_0106", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t097", "id": "ex_0111", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t098", "id": "ex_0122", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t099", "id": "ex_0136", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t100", "id": "ex_0093", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t101", "id": "ex_0136", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t102", "id": "ex_0143", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t103", "id": "ex_0109", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t104", "id": "ex_0138", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t105", "id": "ex_0098", "models": [{"version": "v3a", "method": "sft", "seed": 45}]}
+{"item": "t106", "id": "ex_0114", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t107", "id": "ex_0109", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t108", "id": "ex_0120", "models": [{"version": "v3a", "method": "sft", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t109", "id": "ex_0118", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t110", "id": "ex_0398", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t111", "id": "ex_0406", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t112", "id": "ex_0122", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t113", "id": "ex_0092", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t114", "id": "ex_0120", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t115", "id": "ex_0133", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t116", "id": "ex_0118", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t117", "id": "ex_0114", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t118", "id": "ex_0092", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t119", "id": "ex_0091", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t120", "id": "ex_0107", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t121", "id": "ex_0094", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t122", "id": "ex_0143", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t123", "id": "ex_0112", "models": [{"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t124", "id": "ex_0091", "models": [{"version": "v3a", "method": "dpo", "seed": 44}]}
+{"item": "t125", "id": "ex_0124", "models": [{"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "sft", "seed": 42}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t126", "id": "ex_0120", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t127", "id": "ex_0143", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t128", "id": "ex_0098", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t129", "id": "ex_0124", "models": [{"version": "v3c", "method": "sft", "seed": 44}, {"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t130", "id": "ex_0193", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t131", "id": "ex_0139", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t132", "id": "ex_0667", "models": [{"version": "v3a", "method": "dpo", "seed": 46}, {"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t133", "id": "ex_0133", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t134", "id": "ex_0137", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t135", "id": "ex_0110", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t136", "id": "ex_0137", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t137", "id": "ex_0143", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t138", "id": "ex_0093", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t139", "id": "ex_0111", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t140", "id": "ex_0351", "models": [{"version": "v3a", "method": "sft", "seed": 42}]}
+{"item": "t141", "id": "ex_0093", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t142", "id": "ex_0122", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t143", "id": "ex_0351", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t144", "id": "ex_0114", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t145", "id": "ex_0092", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t146", "id": "ex_0136", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t147", "id": "ex_0120", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t148", "id": "ex_0124", "models": [{"version": "v3a", "method": "sft", "seed": 42}]}
+{"item": "t149", "id": "ex_0094", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t150", "id": "ex_0108", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t151", "id": "ex_0107", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t152", "id": "ex_0125", "models": [{"version": "v3a", "method": "sft", "seed": 44}, {"version": "v3a", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "sft", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t153", "id": "ex_0098", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t154", "id": "ex_0092", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t155", "id": "ex_0114", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t156", "id": "ex_0108", "models": [{"version": "v3a", "method": "sft", "seed": 46}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t157", "id": "ex_0114", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t158", "id": "ex_0122", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t159", "id": "ex_0137", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t160", "id": "ex_0091", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t161", "id": "ex_0135", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t162", "id": "ex_0118", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t163", "id": "ex_0092", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t164", "id": "ex_0091", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t165", "id": "ex_0124", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t166", "id": "ex_0092", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t167", "id": "ex_0351", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t168", "id": "ex_0124", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t169", "id": "ex_0120", "models": [{"version": "v3a", "method": "dpo", "seed": 46}, {"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t170", "id": "ex_0193", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t171", "id": "ex_0124", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t172", "id": "ex_0098", "models": [{"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t173", "id": "ex_0136", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t174", "id": "ex_0135", "models": [{"version": "v3a", "method": "sft", "seed": 46}, {"version": "v3a", "method": "dpo", "seed": 46}, {"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t175", "id": "ex_0114", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t176", "id": "ex_0120", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t177", "id": "ex_0118", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t178", "id": "ex_0139", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t179", "id": "ex_0125", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t180", "id": "ex_0122", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t181", "id": "ex_0114", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t182", "id": "ex_0137", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t183", "id": "ex_0092", "models": [{"version": "v3c", "method": "sft", "seed": 44}]}
+{"item": "t184", "id": "ex_0093", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t185", "id": "ex_0113", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
+{"item": "t186", "id": "ex_0097", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t187", "id": "ex_0135", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t188", "id": "ex_0139", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t189", "id": "ex_0124", "models": [{"version": "v3a", "method": "dpo", "seed": 45}]}
+{"item": "t190", "id": "ex_0108", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t191", "id": "ex_0135", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t192", "id": "ex_0092", "models": [{"version": "v3c", "method": "dpo", "seed": 44}]}
+{"item": "t193", "id": "ex_0412", "models": [{"version": "v3a", "method": "dpo", "seed": 46}, {"version": "v3c", "method": "dpo", "seed": 42}, {"version": "v3c", "method": "sft", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 45}, {"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t194", "id": "ex_0110", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t195", "id": "ex_0094", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t196", "id": "ex_0122", "models": [{"version": "v3a", "method": "sft", "seed": 44}]}
+{"item": "t197", "id": "ex_0106", "models": [{"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t198", "id": "ex_0125", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t199", "id": "ex_0118", "models": [{"version": "v3a", "method": "sft", "seed": 46}]}
+{"item": "t200", "id": "ex_0122", "models": [{"version": "v3a", "method": "sft", "seed": 42}]}
+{"item": "t201", "id": "ex_0112", "models": [{"version": "v3a", "method": "dpo", "seed": 42}, {"version": "v3a", "method": "dpo", "seed": 45}, {"version": "v3a", "method": "dpo", "seed": 46}]}
+{"item": "t202", "id": "ex_0351", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t203", "id": "ex_0118", "models": [{"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t204", "id": "ex_0122", "models": [{"version": "v3c", "method": "sft", "seed": 42}]}
+{"item": "t205", "id": "ex_0123", "models": [{"version": "v3c", "method": "dpo", "seed": 42}]}
+{"item": "t206", "id": "ex_0109", "models": [{"version": "v3c", "method": "dpo", "seed": 44}, {"version": "v3c", "method": "dpo", "seed": 46}]}
+{"item": "t207", "id": "ex_0091", "models": [{"version": "v3a", "method": "sft", "seed": 46}, {"version": "v3c", "method": "sft", "seed": 46}]}
+{"item": "t208", "id": "ex_0120", "models": [{"version": "v3c", "method": "dpo", "seed": 45}]}
+{"item": "t209", "id": "ex_0143", "models": [{"version": "v3c", "method": "sft", "seed": 45}]}
+{"item": "t210", "id": "ex_0118", "models": [{"version": "v3a", "method": "dpo", "seed": 42}]}
