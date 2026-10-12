@@ -1,0 +1,23 @@
+# SFT control for the DPO stage. train_sft_continued.py merges the given SFT LoRA
+# checkpoint into the base model, then trains a fresh LoRA adapter on (prompt, chosen)
+# with the SFT objective. Every setting below equals configs/train/dpo.yaml, minus the
+# two DPO-only ones (beta, loss_type), so the run differs from DPO in the objective alone.
+
+lora:
+  r: 16
+  lora_alpha: 32
+  target_modules: ["q_proj", "v_proj"]
+  task_type: CAUSAL_LM
+
+training:
+  output_dir: checkpoints/sft_continued  # train_sft_continued.py prefixes a run timestamp onto this
+  num_train_epochs: 3
+  per_device_train_batch_size: 1
+  gradient_accumulation_steps: 16  # effective batch size 16; 672 rows x 3 epochs = 126 steps, as in dpo.yaml
+  gradient_checkpointing: true
+  learning_rate: 5.0e-6            # dpo.yaml's value, not lora.yaml's 2e-4
+  logging_steps: 2
+  save_strategy: "no"
+  bf16: true
+  max_length: 512
+  # seed is not set here: pass --seed to train_sft_continued.py (default 42)
