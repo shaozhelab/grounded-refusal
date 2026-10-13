@@ -14,10 +14,9 @@ set of 120 rows that no model trains on: 60 answerable, 41 unanswerable, 19 part
 
 ## Summary
 
-This report covers 2026-09-27 to 2026-10-10. The earlier comparison of SFT and DPO could not
-support a conclusion, because it rested on one training run, on training data with known defects,
-and on an evaluation that never asked whether an answer was right. The work of this period removes
-each of the three:
+The earlier comparison of SFT and DPO could not support a conclusion, because it rested on one
+training run, on training data with known defects, and on an evaluation that never asked whether
+an answer was right. The work of this period removes each of the three:
 
 1. **Training data.** Three successive versions repair three defects: nine question types present
    in the held-out set but absent from training, 26 rows labeled `unanswerable` that the evidence
