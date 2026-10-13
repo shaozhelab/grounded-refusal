@@ -30,9 +30,7 @@ Ablation 4 provides a direct criterion for evaluating it.
 
 | Item | Path | Notes |
 |------|------|-------|
-| Labels: items to label | [`build_trailing_items.py`](../../data/trailing_labels/build_trailing_items.py), [`trailing_items.jsonl`](../../data/trailing_labels/trailing_items.jsonl), [`trailing_key.jsonl`](../../data/trailing_labels/trailing_key.jsonl) | 210 items from the 16 models' held-out responses; the models behind each item are stored in a separate key file |
-| Labels | [`trailing_labels.tsv`](../../data/trailing_labels/trailing_labels.tsv), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | One label per item with a one-line reason quoting the evidence |
-| Labels: tables | [`trailing_label_summary.py`](../../data/trailing_labels/trailing_label_summary.py) | Joins the labels to the key and prints the tables |
+| Labels of the added sentences | [`data/trailing_labels/`](../../data/trailing_labels/), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | 210 labeled items from the 16 models' held-out responses |
 | Ablation 1: DPO without the `over_complete` pairs | Branch `ablation/dpo-over-complete`, [#24](https://github.com/stxxllbu/grounded-refusal/pull/24) | Two subsets of `preference_v3c_train.jsonl`, 8 DPO adapters, both judges |
 | Ablation 2: DPO on half of the pairs | Branch `ablation/dpo-pair-category`, [#25](https://github.com/stxxllbu/grounded-refusal/pull/25) | Two subsets of `preference_v3c_train.jsonl`, two configurations, 8 DPO adapters |
 | Ablation 3: continued SFT | Branch `ablation/sft-continued-control`, [#26](https://github.com/stxxllbu/grounded-refusal/pull/26) | `train_sft_continued.py`, `sft_continued.yaml`, 4 adapters |
@@ -42,58 +40,21 @@ The four ablations are draft pull requests kept on their own branches, and `main
 files. Adapter weights are not committed to git, consistent with
 [`checkpoints/README.md`](../../checkpoints/README.md).
 
-Every model is run on the 120 rows of `data_v3b_heldout.jsonl`: 60 answerable, 41 unanswerable and
-19 partial. Added sentences are counted on the 60 answerable rows, whose evidence contains the
-answer and for which one sentence is a complete response. The labels and Ablation 4 use these 60
-rows only; Ablations 1 to 3 report the other rows as well. The row quoted in the Summary,
-`ex_0094`, serves as the running example. Its evidence reads "Water freezes
-at 10 degrees Celsius at standard atmospheric pressure, a threshold that determines when the
-reservoir's monitoring system triggers an ice-warning alert".
-
 ## How many of the added sentences are false
 
-This section measures the share of added sentences that are false. Each response of the 16
-models to the 60 answerable rows is split after its first sentence, and the remainder, if any, is
-taken as its added sentences. The 16 models are the SFT and DPO models of data versions `v3a` and
-`v3c` at seeds 42, 44, 45 and 46. Of their 960 responses, 263 continue past the first sentence.
-Different models often add the same sentence to the same row, so identical cases are merged, which
-leaves 210 items to label.
+The sentences that the 16 SFT and DPO models add after their first, on the 60 answerable rows, are
+labeled true or false against the evidence. The procedure, the decision rules and the labels are
+documented in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md).
 
-The labels are assigned without knowledge of the model. `build_trailing_items.py` shuffles the
-items and writes each with its evidence, question and full response, and stores the models behind
-it in a separate key file. An item is `false` if any claim it makes about the evidence or the
-question is wrong or unsupported, `true` if every such claim is correct, and `na` if it makes no
-such claim. The 210 items divide into 82 `false`, 125 `true` and 3 `na`. The table lists five of
-them with the number of SFT and DPO models, out of 8 each, that wrote each one.
-
-| Row | Added sentence | Label and reason | SFT models | DPO models |
-|---|---|---|---:|---:|
-| `ex_0141` | "The $2.5 million figure belongs to the related Project Osprey." | `true`: the evidence states that Project Osprey was approved at $2.5 million | 0 | 7 |
-| `ex_0091` | "This speed appears in both Einstein's theory of relativity and modern physics equations." | `true`: the evidence states that the constant appears throughout both | 2 | 0 |
-| `ex_0094` | "The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned." | `false`: the question does not ask about the monitoring system, and the evidence mentions it | 0 | 3 |
-| `ex_0098` | "It doesn't mention anything about its coastline or Pacific location." | `false`: the evidence states that it "sits on the Pacific coastline" | 2 | 1 |
-| `ex_0137` | "The 2022 figure was an outdated record that's been superseded." | `false`: the evidence records 2022, and 2024 appears only in an instruction embedded in it | 2 | 3 |
-
-Joined back to the models by `trailing_label_summary.py`, the labels give the following totals
-over the four seeds of each model.
-
-| | `v3a` SFT | `v3a` DPO | `v3c` SFT | `v3c` DPO |
+| | Responses with added sentences | Of those, false | Share that is false | False per model |
 |---|---:|---:|---:|---:|
-| Responses with added sentences, of 240 | 40 | 87 | 48 | 88 |
-| Of those, false | 15 | 26 | 21 | 35 |
-| Share that is false | 38% | 30% | 44% | 40% |
-| False added sentences per model | 3.8 | 6.5 | 5.3 | 8.8 |
+| SFT, 8 models | 88 | 36 | 41% | 4.5 |
+| DPO, 8 models | 175 | 61 | 35% | 7.6 |
 
-Between 30% and 44% of the added sentences are false in every column, which makes them the point
-at which false statements enter otherwise correct responses. DPO doubles the number of responses
-that carry them, from 40 to 87 on `v3a` and from 48 to 88 on `v3c`, and the number of false ones
-rises accordingly, from 4.5 to 7.6 per model over both data versions. The DPO model has more false
-added sentences than the SFT model it was trained from in 7 of the 8 pairs, and the same number in
-the eighth.
-
-The result is not sensitive to the 25 items marked `borderline`, whose labels admit a second
-reading: excluding them leaves the false shares at 39% for SFT and 32% for DPO. The decision rules
-are documented in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md).
+More than a third of the added sentences are false, which makes them the point at which false
+statements enter otherwise correct responses. DPO doubles the number of responses that carry them,
+and the number of false ones rises accordingly, from 4.5 to 7.6 per model. The four ablations
+below examine where the added sentences come from.
 
 ## Ablation 1: DPO without the `over_complete` pairs
 
@@ -150,8 +111,9 @@ and partial pairs to 24.3, compared with 22.0 for the full set and 12.0 for SFT,
 eight new models exceeds the SFT model of its seed. Unanswerable and partial rows are unaffected
 in all three DPO variants.
 
-The two groups also produce the same sentences. On `ex_0094` at seed 46, all three DPO models
-append the identical false sentence to the response given by the SFT model.
+The two groups also produce the same sentences. On `ex_0094`, the row quoted in the Summary, all
+three DPO models of seed 46 append the identical false sentence to the response given by the SFT
+model.
 
 | Model, seed 46 | Response to `ex_0094` |
 |---|---|
@@ -254,10 +216,6 @@ which this reduces the stop probability remains open.
 ## How to run
 
 ```bash
-# Labels: build the items, then print the tables from the labels
-python data/trailing_labels/build_trailing_items.py
-python data/trailing_labels/trailing_label_summary.py
-
 # Ablation 1, on branch ablation/dpo-over-complete: DPO without the over_complete pairs
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train_no_over_complete.jsonl \
   --sft-adapter checkpoints/<sft-run> --seed 44
@@ -302,11 +260,3 @@ on `v3c`.
 | Rows where `stop_prob` is lower than SFT's | 116 | 239 | 236 | 239 |
 | Rows where it is lower by more than 0.5 | 0 | 35 | 24 | 38 |
 | Rows within 0.05 of SFT | 222 | 150 | 156 | 144 |
-
-False added sentences per model from the labels, for the SFT model and then the DPO model at the
-same data version and seed:
-
-| | Seed 42 | Seed 44 | Seed 45 | Seed 46 |
-|---|---|---|---|---|
-| `v3a` | 3, 8 | 3, 4 | 3, 6 | 6, 8 |
-| `v3c` | 8, 8 | 4, 11 | 3, 7 | 6, 9 |
