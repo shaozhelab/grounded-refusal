@@ -10,10 +10,11 @@ question asks nothing about a monitoring system and the evidence mentions one. D
 a sentence on 22 of the 60 answerable held-out rows and SFT models on 12, with no difference in
 how often the answer itself is correct.
 
-Four ablations characterize these added sentences and attribute them to the DPO loss. Ablation 1
-labels every added sentence of the 16 trained models as true or false against the evidence: more
-than a third are false, and by doubling their number DPO raises the false statements per model
-from 4.5 to 7.6. Ablation 2 trains DPO on each half of the preference pairs separately: either
+Labeled against the evidence, more than a third of these added sentences are false, so a DPO model
+makes 7.6 false statements on the answerable rows where an SFT model makes 4.5. Four ablations
+trace the added sentences to the DPO loss. Ablation 1 retrains DPO without the 20 `over_complete`
+preference pairs, whose preferred responses end in the form the added sentences take: the number
+of added sentences is unchanged. Ablation 2 trains DPO on each half of the preference pairs separately: either
 half adds as many sentences as the full set, often the same one word for word. Ablation 3
 continues SFT for the same 126 steps on the same data in place of DPO: no sentences are added.
 Ablation 4 reads the probability of ending the response after the first sentence: 0.81 for SFT
@@ -29,27 +30,29 @@ Ablation 4 provides a direct criterion for evaluating it.
 
 | Item | Path | Notes |
 |------|------|-------|
-| Ablation 1: items to label | [`build_trailing_items.py`](../../data/trailing_labels/build_trailing_items.py), [`trailing_items.jsonl`](../../data/trailing_labels/trailing_items.jsonl), [`trailing_key.jsonl`](../../data/trailing_labels/trailing_key.jsonl) | 210 items from the 16 models' held-out responses; the models behind each item are stored in a separate key file |
-| Ablation 1: labels | [`trailing_labels.tsv`](../../data/trailing_labels/trailing_labels.tsv), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | One label per item with a one-line reason quoting the evidence |
-| Ablation 1: tables | [`trailing_label_summary.py`](../../data/trailing_labels/trailing_label_summary.py) | Joins the labels to the key and prints the tables |
+| Labels: items to label | [`build_trailing_items.py`](../../data/trailing_labels/build_trailing_items.py), [`trailing_items.jsonl`](../../data/trailing_labels/trailing_items.jsonl), [`trailing_key.jsonl`](../../data/trailing_labels/trailing_key.jsonl) | 210 items from the 16 models' held-out responses; the models behind each item are stored in a separate key file |
+| Labels | [`trailing_labels.tsv`](../../data/trailing_labels/trailing_labels.tsv), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | One label per item with a one-line reason quoting the evidence |
+| Labels: tables | [`trailing_label_summary.py`](../../data/trailing_labels/trailing_label_summary.py) | Joins the labels to the key and prints the tables |
+| Ablation 1: DPO without the `over_complete` pairs | Branch `ablation/dpo-over-complete`, [#24](https://github.com/stxxllbu/grounded-refusal/pull/24) | Two subsets of `preference_v3c_train.jsonl`, 8 DPO adapters, both judges |
 | Ablation 2: DPO on half of the pairs | Branch `ablation/dpo-pair-category`, [#25](https://github.com/stxxllbu/grounded-refusal/pull/25) | Two subsets of `preference_v3c_train.jsonl`, two configurations, 8 DPO adapters |
 | Ablation 3: continued SFT | Branch `ablation/sft-continued-control`, [#26](https://github.com/stxxllbu/grounded-refusal/pull/26) | `train_sft_continued.py`, `sft_continued.yaml`, 4 adapters |
 | Ablation 4: stop probability | Branch `ablation/stop-probability`, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27) | `stop_probability.py`, `stop_probability_summary.py`, probabilities for 20 models |
 
-Ablations 2, 3 and 4 are draft pull requests kept on their own branches, as
-[#24](https://github.com/stxxllbu/grounded-refusal/pull/24) is, and `main` holds the files of
-Ablation 1. Adapter weights are not committed to git, consistent with
+The four ablations are draft pull requests kept on their own branches, and `main` holds the label
+files. Adapter weights are not committed to git, consistent with
 [`checkpoints/README.md`](../../checkpoints/README.md).
 
-All four ablations are evaluated on the 60 answerable rows of `data_v3b_heldout.jsonl`, the rows
-whose evidence contains the answer and for which one sentence is a complete response. The row
-quoted in the Summary, `ex_0094`, serves as the running example. Its evidence reads "Water freezes
+Every model is run on the 120 rows of `data_v3b_heldout.jsonl`: 60 answerable, 41 unanswerable and
+19 partial. Added sentences are counted on the 60 answerable rows, whose evidence contains the
+answer and for which one sentence is a complete response. The labels and Ablation 4 use these 60
+rows only; Ablations 1 to 3 report the other rows as well. The row quoted in the Summary,
+`ex_0094`, serves as the running example. Its evidence reads "Water freezes
 at 10 degrees Celsius at standard atmospheric pressure, a threshold that determines when the
 reservoir's monitoring system triggers an ice-warning alert".
 
-## Ablation 1: how many of the added sentences are false
+## How many of the added sentences are false
 
-This ablation measures the share of added sentences that are false. Each response of the 16
+This section measures the share of added sentences that are false. Each response of the 16
 models to the 60 answerable rows is split after its first sentence, and the remainder, if any, is
 taken as its added sentences. The 16 models are the SFT and DPO models of data versions `v3a` and
 `v3c` at seeds 42, 44, 45 and 46. Of their 960 responses, 263 continue past the first sentence.
@@ -91,6 +94,30 @@ the eighth.
 The result is not sensitive to the 25 items marked `borderline`, whose labels admit a second
 reading: excluding them leaves the false shares at 39% for SFT and 32% for DPO. The decision rules
 are documented in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md).
+
+## Ablation 1: DPO without the `over_complete` pairs
+
+This ablation tests whether the added sentences are learned from the 20 `over_complete` preference
+pairs. These are the only pairs whose `chosen` response answers a row with counterfactual evidence
+and then ends in "... is not mentioned", the form most added sentences take.
+
+DPO is retrained on two subsets of `preference_v3c_train.jsonl`, each of 652 pairs: one without the
+20 `over_complete` pairs, and one without 20 pairs drawn at random, as a control for training on 20
+fewer pairs. `train_dpo.py` is run on each subset under seeds 42, 44, 45 and 46, from the same
+`v3c` SFT checkpoints and with the same configuration as the full-data DPO models, and the eight
+new models are scored by both judges.
+
+The table reports means per model over the four seeds.
+
+| | SFT | DPO, all 672 pairs | DPO, no `over_complete` | DPO, 20 random pairs removed |
+|---|---:|---:|---:|---:|
+| Responses with added sentences, answerable rows, of 60 | 12.0 | 22.0 | 22.0 | 23.3 |
+| Rows answered correctly, of 79 | 70.8 | 71.0 | 71.0 | 70.0 |
+
+Removing the `over_complete` pairs cannot be distinguished from removing 20 random pairs: both
+leave the number of responses with added sentences at the level of full-data DPO, and answer
+accuracy is unchanged in every column. The added sentences are therefore not learned from these
+pairs.
 
 ## Ablation 2: DPO trained on each half of the preference pairs
 
@@ -227,9 +254,13 @@ which this reduces the stop probability remains open.
 ## How to run
 
 ```bash
-# Ablation 1: build the items, then print the tables from the labels
+# Labels: build the items, then print the tables from the labels
 python data/trailing_labels/build_trailing_items.py
 python data/trailing_labels/trailing_label_summary.py
+
+# Ablation 1, on branch ablation/dpo-over-complete: DPO without the over_complete pairs
+python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train_no_over_complete.jsonl \
+  --sft-adapter checkpoints/<sft-run> --seed 44
 
 # Ablation 2, on branch ablation/dpo-pair-category: DPO on one half of the pairs
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train_answerable_only.jsonl \
@@ -272,7 +303,7 @@ on `v3c`.
 | Rows where it is lower by more than 0.5 | 0 | 35 | 24 | 38 |
 | Rows within 0.05 of SFT | 222 | 150 | 156 | 144 |
 
-False added sentences per model in Ablation 1, for the SFT model and then the DPO model at the
+False added sentences per model from the labels, for the SFT model and then the DPO model at the
 same data version and seed:
 
 | | Seed 42 | Seed 44 | Seed 45 | Seed 46 |
