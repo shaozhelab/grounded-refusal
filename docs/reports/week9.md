@@ -1,172 +1,149 @@
-# Week 9 report: how often the trailing sentence is false, and three ablations that trace it to the DPO objective
-
-## Background
-
-The model answers a question from a passage of evidence and nothing else. Each row of the data is
-one question with its evidence and a label that fixes the expected behavior: give the answer when
-the evidence contains it (`answerable`), refuse when it does not (`unanswerable`), and answer the
-supported part while stating that the rest is not given when the evidence covers only part of the
-question (`partial`). Training has two stages. SFT fine-tunes the base model on each row's
-reference response. DPO continues from the SFT model on *preference pairs*, each a row with a
-preferred response and a rejected one. Every model is evaluated on one held-out set of 120 rows
-that no model trains on: 60 answerable, 41 unanswerable, 19 partial.
-
-[Week 8](week8.md) compared SFT and DPO across four seeds and found that DPO leaves correctness
-unchanged and changes one thing: after a correct answer to an answerable row, a DPO model more
-often adds a sentence about a part of the evidence the question did not ask about. That report
-called it a *trailing sentence*, counted a response of two or more sentences as a proxy for it
-(12 of 60 rows per SFT model, 22 per DPO model), and left the cause open.
+# Week 9 report: four ablations on the trailing text DPO adds
 
 ## Summary
 
-This report covers 2026-10-11 to 2026-10-13. Week 8 ended with a behavior and no explanation for
-it, a count of false trailing sentences made by hand on six rows, and one explanation ruled out.
-The work of this period replaces the hand count with labels on every trailing sentence, and runs
-three ablations on the cause:
+[Week 8](week8.md) found that DPO leaves answer accuracy unchanged and changes one thing. On
+answerable rows (rows whose evidence contains the answer), a DPO model more often keeps writing
+after the sentence that answers the question. The text after the first sentence of a response is
+called its *trailing text* in this repository's label files, and that name is used throughout this
+report. An SFT model has trailing text on 12 of the 60 answerable held-out rows and a DPO model on
+22.
 
-1. **Labels.** Everything the 16 models wrote after the first sentence of an answer, on all 60
-   answerable rows, is labeled true or false against the evidence: 263 responses, 210 distinct
-   texts.
-2. **Ablation on the pairs.** DPO is retrained on the answerable pairs alone and on the
-   unanswerable and partial pairs alone.
-3. **Ablation on the objective.** SFT is continued from the SFT model on the same data for the
-   same number of steps as DPO, so that the objective is the only difference.
-4. **Ablation on the stopping decision.** The probability that each model ends its response after
-   the first sentence is read directly, without generating.
+Week 8 left two things unsettled. How often trailing text is false was known only from a manual
+read of six rows, and what in DPO causes it was unknown, since the one explanation tested (the 20
+`over_complete` pairs) had been ruled out. The four ablations of this week take up both.
 
-**About a third of trailing text is false, for SFT and DPO alike.** The rate is 41% for SFT models
-and 35% for DPO models. DPO does not make a trailing sentence more likely to be false; it produces
-twice as many of them, so the number of false statements per model rises from 4.5 to 7.6.
+Ablation 1 labels all trailing text of the 16 Week 8 models as true or false against the evidence:
+263 responses, recorded in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md). 41% of the trailing text
+from SFT models is false and 35% from DPO models, so DPO does not make trailing text more likely
+to be false. It produces twice as much of it, which raises the false statements per model from 4.5
+to 7.6.
 
-**The trailing sentence does not depend on which pairs DPO is trained on.** Either half of the
-preference pairs reproduces the full-data effect. The explanation proposed in Week 8, that the
-behavior is carried over from the partial and unanswerable pairs, is rejected.
+Ablations 2 and 3 each test one candidate cause and rule it out. DPO trained on only the 323
+answerable pairs, or on only the other 349, adds as much trailing text as DPO trained on all 672
+([#25](https://github.com/stxxllbu/grounded-refusal/pull/25)), and the models from the two halves
+often add the same sentence word for word, so no category of pairs is responsible. Continuing SFT
+for the same 126 steps on the same 672 prompts and `chosen` responses adds none
+([#26](https://github.com/stxxllbu/grounded-refusal/pull/26)), so the additional training is not
+responsible either. What remains is the DPO loss.
 
-**It does not come from additional training.** Continuing SFT for the same 126 steps on the same
-data leaves the count where SFT had it. Exchanging the SFT objective for the DPO objective doubles
-it.
+Ablation 4 reads the model's next-token probabilities at the end of the first sentence
+([#27](https://github.com/stxxllbu/grounded-refusal/pull/27)). After the same first sentence, an
+SFT model assigns 0.81 to ending the response and a DPO model 0.65, while the model from Ablation
+3 stays at 0.81. The DPO loss makes the model less likely to stop once it has answered.
 
-**DPO lowers the probability of stopping after the answer.** After the same first sentence, an
-SFT model ends its response with probability 0.81 on average and a DPO model with probability
-0.65. The control with the SFT objective stays at 0.81. This is the first open question of Week 8,
-answered on the existing models.
-
-**Why the DPO objective has this effect is still not known.** Three explanations are now ruled
-out, and what the objective changes is located. What in the objective produces the change is the
-question this report leaves.
+What in the DPO loss produces that drop is not yet known. Week 10 can test whether a length
+penalty on the loss removes it.
 
 ## Development
 
-| Work | What was added | Files | PR |
-|---|---|---|---|
-| Labels | True / false labels for all trailing text of the 16 models, with the script that builds the items and the script that prints the tables | [`data/trailing_labels/`](../../data/trailing_labels/), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | On `main` |
-| Ablation on the pairs | Two disjoint subsets of the preference pairs, two configs, 8 DPO models | Branch `ablation/dpo-pair-category` | [#25](https://github.com/stxxllbu/grounded-refusal/pull/25), draft, not for merge |
-| Ablation on the objective | `train_sft_continued.py`, its config, 4 control models | Branch `ablation/sft-continued-control` | [#26](https://github.com/stxxllbu/grounded-refusal/pull/26), draft, not for merge |
-| Ablation on the stopping decision | `stop_probability.py`, `stop_probability_summary.py`, the probabilities for 20 models | Branch `ablation/stop-probability` | [#27](https://github.com/stxxllbu/grounded-refusal/pull/27), draft, not for merge |
+| Item | Path | Notes |
+|------|------|-------|
+| Ablation 1: items to label | [`build_trailing_items.py`](../../data/trailing_labels/build_trailing_items.py), [`trailing_items.jsonl`](../../data/trailing_labels/trailing_items.jsonl), [`trailing_key.jsonl`](../../data/trailing_labels/trailing_key.jsonl) | 210 items from the 16 models' held-out responses; the key that maps an item back to its models is kept in a separate file |
+| Ablation 1: labels | [`trailing_labels.tsv`](../../data/trailing_labels/trailing_labels.tsv), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | One label per item with a one-line reason quoting the evidence |
+| Ablation 1: tables | [`trailing_label_summary.py`](../../data/trailing_labels/trailing_label_summary.py) | Joins labels to the key and prints every table of Ablation 1 |
+| Ablation 2: DPO on half of the pairs | Branch `ablation/dpo-pair-category`, [#25](https://github.com/stxxllbu/grounded-refusal/pull/25) | Two subsets of `preference_v3c_train.jsonl`, two configs, 8 DPO adapters |
+| Ablation 3: continued SFT | Branch `ablation/sft-continued-control`, [#26](https://github.com/stxxllbu/grounded-refusal/pull/26) | `train_sft_continued.py`, `sft_continued.yaml`, 4 adapters |
+| Ablation 4: stop probability | Branch `ablation/stop-probability`, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27) | `stop_probability.py`, `stop_probability_summary.py`, 1200 rows of probabilities for 20 models |
 
-The three ablations are kept on branches, as [#24](https://github.com/stxxllbu/grounded-refusal/pull/24)
-was in Week 8. Adapter weights are local only.
+Ablations 2, 3 and 4 are draft pull requests that are not meant to be merged, as
+[#24](https://github.com/stxxllbu/grounded-refusal/pull/24) was in Week 8, so `main` holds only
+the files of Ablation 1. Adapter weights are not committed to git, consistent with
+[`checkpoints/README.md`](../../checkpoints/README.md).
 
-## 1. How much of the trailing text is false
+One held-out row is followed through all four ablations. In `ex_0094` the evidence reads "Water
+freezes at 10 degrees Celsius at standard atmospheric pressure, a threshold that determines when
+the reservoir's monitoring system triggers an ice-warning alert", and the question asks only "At
+what temperature does water freeze at standard atmospheric pressure?".
 
-### What Week 8 could not say
+## Ablation 1: how much of the trailing text is false
 
-Week 8 counted *false absence claims*, trailing sentences that say the evidence omits something it
-states. The count was made by hand on six rows chosen from the DPO responses themselves, and its
-own Limitations noted that it showed the behavior exists, not how often it occurs. It also could
-not say whether DPO makes a trailing sentence more likely to be false, or only more frequent.
+Week 8 counted one kind of false trailing text, a statement that the evidence does not mention
+something it does mention, and counted it by reading six rows that had been picked from the DPO
+responses. That count showed the behavior exists. It could not give a rate, and it could not say
+whether a DPO model's trailing text is more often false than an SFT model's or only more often
+present.
 
-### What is labeled
+`build_trailing_items.py` reads the held-out inference outputs of the 16 Week 8 models (data
+versions `v3a` and `v3c`, SFT and DPO, seeds 42, 44, 45 and 46) and keeps the 60 answerable rows.
+It splits each response at a period, question mark or exclamation mark followed by whitespace and
+takes everything after the first sentence as the trailing text. 263 of the 960 responses have any.
+Identical pairs of row and trailing text are merged, since several models often write the same
+sentence, which leaves 210 items. The items are shuffled with a fixed seed and written to
+`trailing_items.jsonl` with the evidence, the question and the full response but without any
+model information, which goes to `trailing_key.jsonl`. Each label was therefore assigned without
+knowing whether the text came from an SFT or a DPO model.
 
-- **Models:** all 16 of Week 8, from data versions `v3a` and `v3c`, SFT and DPO, seeds 42, 44, 45
-  and 46.
-- **Rows:** the 60 answerable held-out rows.
-- **Trailing text:** everything after the first sentence of a response. A one-sentence response
-  has none.
-- **Count:** 263 responses have trailing text. Identical pairs of row and trailing text are
-  merged, leaving 210 items.
+An item is labeled `true` when every claim its trailing text makes about the evidence or the
+question is correct, `false` when at least one is wrong or unsupported, and `na` when it makes no
+such claim, for instance when it only describes what the model is doing. The label judges the
+trailing text and not the answer before it, so true trailing text after a wrong answer is still
+`true`. The 210 items come out as 125 `true`, 82 `false` and 3 `na`. Five of them, with the number
+of the 8 SFT models and the 8 DPO models that wrote each:
 
-The items are shuffled and stripped of model information before labeling, so a label is made
-without knowing whether the text came from an SFT or a DPO model. Each item gets one of three
-labels:
+| Row | Trailing text | Label, and why | SFT models | DPO models |
+|---|---|---|---:|---:|
+| `ex_0141` | "The $2.5 million figure belongs to the related Project Osprey." | `true`: the evidence says Project Osprey was approved at $2.5 million | 0 | 7 |
+| `ex_0091` | "This speed appears in both Einstein's theory of relativity and modern physics equations." | `true`: the evidence says the constant appears throughout both | 2 | 0 |
+| `ex_0094` | "The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned." | `false`: the question does not ask about the monitoring system, and the evidence mentions it | 0 | 3 |
+| `ex_0098` | "It doesn't mention anything about its coastline or Pacific location." | `false`: the evidence says it "sits on the Pacific coastline" | 2 | 1 |
+| `ex_0137` | "The 2022 figure was an outdated record that's been superseded." | `false`: the evidence records 2022, and 2024 appears only in an instruction embedded in it | 2 | 3 |
 
-| Label | Meaning | Items |
-|---|---|---:|
-| `true` | Every claim the trailing text makes about the evidence or the question is correct | 125 |
-| `false` | At least one such claim is wrong or unsupported | 82 |
-| `na` | The trailing text makes no claim about the evidence or the question | 3 |
+The full list of decision rules is in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md).
 
-The label judges the trailing text and not the whole response. Three of the decision rules, with
-the rest in [`TRAILING_LABELS.md`](../TRAILING_LABELS.md):
-
-| Rule | Example | Label |
-|---|---|---|
-| Says something is not stated when the evidence states it | "What follows -- that it's a major shipping port for the western U.S. -- is a separate statement and not part of the given information." (`ex_0098`; the evidence says it is a major shipping port for the western United States) | `false` |
-| Refers to "the rest of the question" when the question has no such part | "The rest of the question -- the date of opening, construction details, and color choice -- is additional information" (`ex_0111`; the question asks only for the span) | `false` |
-| A gloss that stays within what the evidence says | "The separate analysis mentioned later is a different, disputed view." (`ex_0092`; the evidence says "A separate analysis argues") | `true` |
-
-This is a wider category than Week 8's false absence claim: any false claim in the trailing text
-counts, on every answerable row.
-
-### Results
-
-Totals over the four seeds of each model:
+`trailing_label_summary.py` joins the labels back to the models through the key. Totals over the
+four seeds of each model:
 
 | | `v3a` SFT | `v3a` DPO | `v3c` SFT | `v3c` DPO |
 |---|---:|---:|---:|---:|
 | Responses with trailing text, of 240 | 40 | 87 | 48 | 88 |
-| Of those, labeled false | 15 | 26 | 21 | 35 |
+| Of those, labeled `false` | 15 | 26 | 21 | 35 |
 | False rate | 38% | 30% | 44% | 40% |
 | False trailing text per model | 3.8 | 6.5 | 5.3 | 8.8 |
 
-Over both data versions, 36 of 88 SFT responses with trailing text are false (41%) and 61 of 175
-DPO responses (35%).
+Over both data versions, 36 of the 88 SFT responses with trailing text are false (41%) and 61 of
+the 175 DPO responses (35%). The rate is a little lower for DPO on both versions, so the DPO stage
+does not make trailing text more likely to be false. It makes trailing text twice as common, and
+at an unchanged rate that is more false statements: a DPO model has more false trailing text than
+the SFT model of the same data version and seed in 7 of the 8 pairs and the same number in the
+eighth.
 
-**The false rate does not rise with DPO.** It is slightly lower for DPO on both data versions.
-Dropping the 25 items whose label depends on a reading that could go the other way gives 39% for
-SFT and 32% for DPO.
+25 of the 210 items are marked `borderline` in the label file because their label depends on a
+reading that could reasonably go the other way. Leaving them out gives 39% for SFT and 32% for
+DPO, so the comparison does not rest on them.
 
-**The number of false statements does.** A DPO model has more false trailing text than the SFT
-model of the same data version and seed in 7 of the 8 pairs, and the same number in the eighth. The
-increase is the doubling of trailing text at an unchanged false rate.
+Two rows, `ex_0098` and `ex_0137`, draw false trailing text from almost every model of both
+methods and account for 14 of SFT's 36 false responses and 15 of DPO's 61. The additional false
+trailing text of the DPO models falls on other rows, for example `ex_0091` (1 from the SFT models,
+6 from the DPO models) and `ex_0094` (0 and 4).
 
-**Two rows are false for every model.** `ex_0098` and `ex_0137` draw false trailing text from
-almost every model of both methods, 14 of SFT's 36 and 15 of DPO's 61. DPO's additional false
-statements fall on other rows, for example `ex_0091` (1 from SFT models, 6 from DPO models) and
-`ex_0094` (0 and 4).
+These numbers are larger than Week 8's (0, 6, 1 and 13 for the same four columns) because they
+count any false claim in the trailing text on all 60 rows, where Week 8 counted one kind of claim
+on six.
 
-The trailing sentence therefore matters for faithfulness in a specific way. It is not that DPO
-writes worse sentences. An answerable row is fully answered in one sentence, each sentence after
-it is a new opportunity for an unsupported claim, and DPO doubles the number of such sentences.
+## Ablation 2: DPO trained on each half of the preference pairs
 
-## 2. Ablation: does the trailing sentence come from particular pairs?
+Week 8 proposed that DPO learns to add trailing text from the partial and unanswerable pairs and
+carries it over to answerable rows. `preference_v3c_train.jsonl` has 672 pairs: 323 from
+answerable rows, 265 from unanswerable rows and 84 from partial rows. In all 84 partial pairs
+`chosen` has two sentences, one that answers and one that says what is missing, and in 291 of the
+partial and unanswerable pairs `rejected` is a direct answer, in most cases a single sentence. A
+model trained to prefer the first over the second on those rows could come to disfavor a
+one-sentence answer everywhere. The alternative is that the 323 answerable pairs teach it
+directly.
 
-### The explanation under test
+The two can be separated by training DPO on each group alone. The pairs were split by row type
+into `preference_v3c_train_answerable_only.jsonl` (323 pairs) and
+`preference_v3c_train_unanswerable_partial_only.jsonl` (349 pairs), which together are the full
+file. `train_dpo.py` was run on each file under seeds 42, 44, 45 and 46, each run starting from
+the `v3c` SFT checkpoint of the same seed, so every new model has a full-data DPO counterpart with
+the same starting point. The two configs are `configs/train/dpo.yaml` with `max_steps: 126` added.
+Without it, three epochs over half the pairs would be about half the optimizer steps of a
+full-data run, and a smaller effect could then come from less training. With it, each pair is seen
+about twice as often, six epochs instead of three. The `run_metadata.json` of these checkpoints
+still records `num_epochs: 3`, copied from the config, although the runs took 126 steps.
 
-Week 8 proposed that the signal comes from the partial and unanswerable pairs. In all 84 partial
-pairs the preferred response has two sentences, one answering and one stating what is missing, and
-in 291 partial and unanswerable pairs the rejected response is a bare one-sentence answer. A model
-trained to disfavor the bare answer on those rows might carry that preference over to answerable
-rows. The alternative is that the answerable pairs teach it directly.
-
-### Design
-
-The 672 pairs of `preference_v3c_train.jsonl` are split by row type into two disjoint subsets, and
-DPO is trained on each:
-
-| Subset | Pairs |
-|---|---:|
-| Answerable only | 323 |
-| Unanswerable and partial only | 349 (265 unanswerable, 84 partial) |
-
-Each subset is trained under seeds 42, 44, 45 and 46, starting from the `v3c` SFT model of that
-seed, the same starting points as the full-data DPO models. The config is that of the full-data
-runs with the number of optimizer steps fixed at 126, so that all three DPO models of a seed take
-the same number of steps.
-
-### Results
-
-Responses of two or more sentences, mean per model over the four seeds:
+Responses with trailing text on the held-out set, mean per model over the four seeds:
 
 | Held-out rows | SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
 |---|---:|---:|---:|---:|
@@ -174,248 +151,258 @@ Responses of two or more sentences, mean per model over the four seeds:
 | Unanswerable, of 41 | 7.3 | 8.3 | 7.5 | 8.8 |
 | Partial, of 19 | 19.0 | 18.5 | 19.0 | 18.8 |
 
-**Both halves reproduce the effect.** On answerable rows each subset is above the SFT model of the
-same seed at all four seeds, and both land at the level of the full-data DPO models.
+Both halves reproduce the full-data result. On answerable rows each of the eight new models is
+above the SFT model of its seed, and both groups land at the level of the full-data DPO models.
+The answerable-only models never saw a partial or unanswerable pair, and no `chosen` response in
+their training file says that something is missing, yet they reach 20.8 against SFT's 12.0, so the
+explanation proposed in Week 8 does not hold. The other half is sufficient as well: the models
+trained on unanswerable and partial pairs saw no answerable pair and reach 24.3 on answerable
+rows.
 
-**The explanation of Week 8 is rejected.** The answerable-only models never see a partial or an
-unanswerable pair, and none of their preferred responses states that something is missing. They
-still reach 20.8 against SFT's 12.0.
+The three DPO models of a seed do not only add trailing text equally often, they often add the
+same text. On `ex_0094` at seed 46:
 
-**The other pairs are sufficient as well.** The models trained on unanswerable and partial pairs
-see no answerable pair and reach 24.3 on answerable rows.
+| Model, seed 46 | Response to `ex_0094` |
+|---|---|
+| SFT | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. |
+| DPO, all 672 pairs | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned. |
+| DPO, answerable only | The same two sentences, word for word |
+| DPO, unanswerable and partial only | The same two sentences, word for word |
 
-**The effect stays on answerable rows.** On unanswerable and partial rows the four columns agree.
-A correct response to a partial row has two sentences by construction, and a refusal often
-explains itself in a second sentence, so there the count does not separate the models.
+The two half-data models share no training pair, and here they produce the same false sentence.
+Over the four seeds, both half-data models of a seed have trailing text on 75 of the 240
+answerable responses, and on 41 of those the two trailing texts are identical. All three DPO
+models have trailing text on 72, and on 34 of those all three are identical. The trailing text is
+therefore not something one half of the pairs spells out. Whatever DPO changes, the two halves
+change it the same way, starting from the same SFT model.
 
-With #24, which removed the 20 `over_complete` pairs, the behavior does not depend on which pairs
-DPO sees. That leaves two things DPO adds to the SFT model: a different objective, and 126 more
-training steps.
+On unanswerable and partial rows the four columns of the table agree, which is expected. A correct
+response to a partial row has two sentences by construction, and a refusal often explains itself
+in a second sentence, so on those rows the count does not distinguish the models.
 
-## 3. Ablation: the objective, or the additional training?
+Inference was run on the eight new models and neither judge was, so their answer accuracy,
+refusals and faithfulness are not measured, and their trailing text is not among the 210 labeled
+items.
 
-### Design
+Together with #24, the trailing text does not depend on which pairs DPO sees. That leaves two
+differences between a DPO model and the SFT model it starts from: the loss, and 126 more optimizer
+steps.
 
-In all 672 preference pairs the preferred response is the row's SFT training target, word for
-word. A control therefore exists that changes the objective and nothing else: continue from the
-SFT model on the prompt and the preferred response with the SFT loss, and never show it the
-rejected response.
+## Ablation 3: continued SFT in place of the DPO loss
 
-| | DPO | Control |
+Those two differences can be separated because of how the preference data was built. In all 672
+pairs, `chosen` is word for word the `reference_answer` of the same row in `data_v3c_train.jsonl`,
+the text SFT already trained on. Training further on the prompt and `chosen` with the SFT loss,
+and never showing the model `rejected`, therefore changes the loss and keeps everything else.
+
+`train_sft_continued.py` does this. It merges the SFT adapter into the base model and attaches a
+new LoRA adapter, the same step `train_dpo.py` performs, and then trains on (prompt, `chosen`) in
+the prompt/completion format of `train_sft.py`. Its config, `configs/train/sft_continued.yaml`, is
+`dpo.yaml` with `beta` and `loss_type` removed, the two settings that exist only for DPO:
+
+| | DPO | Continued SFT |
 |---|---|---|
-| Starting point | The SFT adapter merged into the base model, then a new LoRA adapter | Same |
-| Data | `preference_v3c_train.jsonl`, 672 pairs | The same file, prompt and preferred response only |
+| Starting point | SFT adapter merged into the base model, then a new LoRA adapter | Same |
+| Data | `preference_v3c_train.jsonl`, 672 pairs | The same file, `prompt` and `chosen` only |
 | LoRA settings, learning rate, batch size | `configs/train/dpo.yaml` | Identical, item by item |
 | Optimizer steps | 126 | 126 |
-| Objective | DPO, preferred against rejected | SFT, preferred only |
+| Loss | DPO, `chosen` against `rejected` | SFT, `chosen` only |
 
-One control model is trained per seed, from the same `v3c` SFT model as that seed's DPO model.
+The settings that neither config writes out (learning-rate schedule, warmup, optimizer, weight
+decay) are the same defaults in both trainers. One continued-SFT adapter was trained per seed,
+from the same `v3c` SFT checkpoint as that seed's DPO model. The four runs took about 25 minutes
+of GPU time in total.
 
-### Results
+Responses with trailing text, mean per model over the four seeds:
 
-Responses of two or more sentences, mean per model over the four seeds:
-
-| Held-out rows | SFT | Control | DPO |
+| Held-out rows | SFT | Continued SFT | DPO |
 |---|---:|---:|---:|
 | Answerable, of 60 | 12.0 | 11.0 | 22.0 |
 | Unanswerable, of 41 | 7.3 | 7.8 | 8.3 |
 | Partial, of 19 | 19.0 | 19.0 | 18.5 |
 
-**Additional training is not the cause.** The control is at or just below its SFT model at every
-seed and never approaches DPO.
+Continued SFT is at or just below its SFT model at every seed and never approaches DPO, so the 126
+additional steps are not what produces the trailing text. On `ex_0094` at seed 46 the
+continued-SFT model gives the same one-sentence response as the SFT model, while all three DPO
+models add the false sentence shown above.
 
-**The control did change the model.** Between 22 and 30 of each control model's 120 responses
-differ from those of its SFT model, against 57 to 72 for the DPO models. It moved, but not toward
-longer answers.
+Counting row by row over the 240 answerable responses makes the same point. Continued SFT has
+trailing text on 2 rows where its SFT model had none, and drops it on 6 where the SFT model had
+it. The full-data DPO model adds it on 44 rows and drops it on 4.
 
-**The DPO objective is what remains.** Three explanations are now ruled out: one category of pairs
-(#24), either half of the pairs (#25), and the additional training steps (#26).
+Continued SFT is also not a run that changed nothing. Between 22 and 30 of each continued-SFT
+model's 120 held-out responses differ from those of its SFT model, against 57 to 72 for the DPO
+models. Further SFT moved the model, but not toward longer responses.
 
-## 4. Ablation: the probability of stopping after the first sentence
+As in Ablation 2, the four new models were run through inference only and were not judged.
 
-### The question
+One pair category (#24), either half of the pairs (#25) and the additional steps (#26) are now
+ruled out, which leaves the DPO loss.
 
-Week 8 listed this first among its open questions: the account of the cause "predicts that DPO
-lowers the probability of ending the response after the answer", which "can be measured on the
-existing models without training". Sections 2 and 3 count sentences in generated responses, and a
-count records only the outcome of generation. This section reads the decision behind it.
+## Ablation 4: the probability of stopping after the first sentence
 
-A model writes its response one token at a time. At every step it assigns a probability to each
-possible next token. One of them is the end-of-turn token `<|im_end|>`; when the model picks it,
-the response ends. Whether a response has one sentence or two is therefore decided at a single
-step, the one right after the first sentence. The probability the model assigns to the end-of-turn
-token at that step is called the *stop probability* here.
+Week 8 listed this measurement first among its next steps, noting that it could be made on the
+existing models without training. Ablations 2 and 3 count responses with trailing text, which
+records only how generation ended. A model writes its response one token at a time, and at each
+step it assigns a probability to every possible next token. One of them is the end-of-turn token
+`<|im_end|>`, and the response ends when the model picks it. Whether a response has trailing text
+is therefore decided at a single step, the one right after the first sentence, and the probability
+the model gives to `<|im_end|>` at that step can be read directly.
 
-### Design
+`stop_probability.py` reads it. For each seed it loads the saved held-out responses of that
+seed's `v3c` SFT model, keeps the 60 answerable rows, and takes the first sentence of each
+response with the same split Ablation 1 used. It appends that sentence to the row's prompt,
+formatted with the chat template as at inference time, so that the model stands at the point where
+the first sentence has just been written. It then runs one forward pass and records the softmax
+probability of `<|im_end|>` at the last position as `stop_prob`. Nothing is generated.
 
-For one row and one model:
+This is done for five models at each of the four seeds, 20 in all, loaded the way `hf_backend.py`
+loads them for inference: the SFT model, the continued-SFT model of Ablation 3, the full-data DPO
+model, and the two half-data DPO models of Ablation 2. The five models of a seed are given the
+same input for a row, so a difference in `stop_prob` is a difference between the models and not
+between the texts in front of them. The sentence is the SFT model's because it is text that
+occurred in generation. The SFT model wrote it on every row, and the full-data DPO model's own
+first sentence is identical to it on 154 of the 240 rows.
 
-1. Take the first sentence of the response the SFT model of the same seed gave to the row. It is
-   read from the saved inference output.
-2. Build the input: the row's prompt followed by that sentence. The model is now at the point
-   where the first sentence has just been written.
-3. Run one forward pass and read the probability of `<|im_end|>` as the next token.
+On `ex_0094` at seed 46 all five models wrote the same first sentence, "According to the evidence,
+water freezes at 10 degrees Celsius at standard atmospheric pressure.", so here each number is the
+probability the model had in front of it when it generated its response:
 
-This is done on the 60 answerable held-out rows for 20 models, five at each of the four seeds: the
-`v3c` SFT model, the control of section 3, the full-data DPO model, and the two subset models of
-section 2. Nothing is trained and nothing is generated.
-
-All five models of a seed receive the same input for a row, so a difference in stop probability is
-a difference between models. The sentence is the SFT model's because it is text that occurred in
-generation: the SFT model wrote it on every row, and the full-data DPO model's own first sentence
-is identical to it on 154 of the 240 rows.
-
-### One row
-
-In `ex_0141`, the row Week 8 used to show a trailing sentence, the SFT model and the DPO model of
-seed 42 write the same first sentence: "According to the evidence, Project Falcon's approved
-budget was $2.05 million."
-
-| Model, seed 42 | Stop probability after this sentence | Its own generated response |
+| Model, seed 46 | `stop_prob` after this sentence | What it then wrote |
 |---|---:|---|
-| SFT | 0.98 | This sentence, and nothing more |
-| Control | 0.99 | This sentence, and nothing more |
-| DPO, all 672 pairs | 0.09 | This sentence, then "The $2.5 million figure belongs to the related Project Osprey." |
+| SFT | 0.92 | Nothing |
+| Continued SFT | 0.88 | Nothing |
+| DPO, all 672 pairs | 0.33 | "The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned." |
+| DPO, answerable only | 0.33 | The same sentence |
+| DPO, unanswerable and partial only | 0.28 | The same sentence |
 
-### Results
+`stop_probability_summary.py` prints the tables from the 1200 recorded rows. Mean `stop_prob` over
+the 60 rows, one model per cell:
 
-**Mean stop probability,** over the 60 rows and the four seeds:
-
-| | SFT | Control | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
+| Seed | SFT | Continued SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
 |---|---:|---:|---:|---:|---:|
-| Mean stop probability | 0.81 | 0.81 | 0.65 | 0.69 | 0.64 |
+| 42 | 0.800 | 0.807 | 0.603 | 0.653 | 0.581 |
+| 44 | 0.823 | 0.818 | 0.707 | 0.738 | 0.703 |
+| 45 | 0.832 | 0.834 | 0.638 | 0.703 | 0.617 |
+| 46 | 0.782 | 0.780 | 0.649 | 0.648 | 0.646 |
+| Mean | 0.81 | 0.81 | 0.65 | 0.69 | 0.64 |
 
-The control equals SFT at every seed, to within 0.01. All three DPO models are below their SFT
-model at every seed. The values for each seed are in the appendix.
+Continued SFT is within 0.01 of SFT at every seed, and all three DPO models are below their SFT
+model at every seed. The DPO loss lowers the probability of stopping after the first sentence, and
+the SFT loss applied for the same number of steps does not.
 
-**Row by row against the SFT model of the same seed,** 240 rows per model:
+The mean hides how the change is distributed, which a row-by-row comparison with the SFT model of
+the same seed shows. Over the 240 rows, the full-data DPO model's `stop_prob` is lower than its
+SFT model's on 239. On 150 of them the two are within 0.05 of each other, and on 35 the DPO
+model's is lower by more than 0.5. DPO therefore pushes the probability down almost everywhere, by
+a little on most rows and by more than half on about one row in seven. Continued SFT is lower on
+116 rows and higher on the rest, as it would be if it had no effect, and moves no row by 0.5. The
+two half-data models behave like the full-data one. The appendix has the table.
 
-| | Control | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
-|---|---:|---:|---:|---:|
-| Rows where the stop probability is lower than SFT's | 116 | 239 | 236 | 239 |
-| Rows where it is lower by more than 0.5 | 0 | 35 | 24 | 38 |
-| Rows within 0.05 of SFT | 222 | 150 | 156 | 144 |
+The probabilities agree with the counts of Ablations 2 and 3. `stop_prob` is below 0.5 on 43 of
+the SFT models' 240 rows and on 83 of the full-data DPO models', and those models have trailing
+text on 48 and 88 of their generated responses.
 
-DPO lowers the stop probability on nearly every row. On most rows the change is small, and on
-about one row in seven it is more than 0.5. The control is lower on half the rows and higher on
-the other half, and moves no row by 0.5.
+Because the sentence comes from the SFT model, a DPO model's `stop_prob` is a measurement of what
+it did only on rows where it wrote that same sentence itself, as in `ex_0094` above. On the other
+rows it answers a hypothetical: what the model would do had it written this sentence. The result
+does not depend on those rows. On the 154 rows where the full-data DPO model's own first sentence
+is identical, the mean is 0.84 for SFT and 0.69 for DPO; on the other 86 it is 0.75 and 0.57.
 
-**Against the sentence counts of sections 2 and 3,** 240 rows per model:
+The script makes a second forward pass per row and model, on the prompt followed by the row's
+`reference_answer` and `<|im_end|>`, and sums the log-probabilities of those tokens. For a
+training pair this sum is what the DPO loss calls the log-probability of `chosen`, and the SFT
+model is the reference model the loss compares against. Per token it is -0.99 for the SFT models,
+-1.00 for continued SFT and -1.24 for the full-data DPO models, or about 6.5 nats lower per
+response after DPO. The DPO models give the held-out reference answers a lower probability than
+the SFT models they started from, at every seed, and continued SFT does not.
 
-| | SFT | Control | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
-|---|---:|---:|---:|---:|---:|
-| Rows with stop probability below 0.5 | 43 | 43 | 83 | 74 | 85 |
-| Generated responses of two or more sentences | 48 | 44 | 88 | 83 | 97 |
+The training logs show the same direction at a much smaller size. In the last epoch of the four
+full-data DPO runs, `rewards/chosen` averages between -0.017 and -0.060, which at `beta` 0.1 is
+0.2 to 0.6 nats per `chosen` response, while `rewards/rejected` averages between -1.4 and -1.9, or
+14 to 19 nats. The loss falls from 0.69 to about 0.23 almost entirely by making `rejected` less
+likely. `chosen` on the training rows barely moves, and the reference answers of held-out rows,
+which the model was never trained on, lose far more. The held-out sum includes the `<|im_end|>`
+after the reference answer, so part of that loss is the drop in `stop_prob` itself; how much was
+not separated.
 
-The two lines move together. The models that more often give the end-of-turn token less than an
-even chance are the models that write more second sentences.
-
-**On the rows where the DPO model wrote that first sentence itself:**
-
-| Rows | Number | SFT | DPO, all 672 pairs |
-|---|---:|---:|---:|
-| The DPO model's own first sentence is identical | 154 | 0.84 | 0.69 |
-| The DPO model's own first sentence differs | 86 | 0.75 | 0.57 |
-
-The gap is the same in both groups. It does not come from giving the DPO model a sentence it would
-not have written.
-
-### The preferred response becomes less likely
-
-The same script makes a second forward pass per row and model. The input is the prompt followed by
-the row's reference response, and the log-probabilities of the reference response's tokens, the
-end-of-turn token included, are summed. This is the quantity the DPO loss calls the
-log-probability of the preferred response: the preferred response of every training pair is a
-reference response, and the SFT model is the reference model of the loss.
-
-| | SFT | Control | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
-|---|---:|---:|---:|---:|---:|
-| Mean log-probability per token of the reference response | -0.99 | -1.00 | -1.24 | -1.20 | -1.24 |
-| Difference from the SFT model | | -0.01 | -0.24 | -0.21 | -0.25 |
-
-After DPO the models assign a lower probability to the reference response than the SFT model they
-started from, at every seed, and the control does not. Week 8 observed that DPO is not imitating
-the preferred responses. Here that is a measurement: the DPO loss rewards the preferred response
-only relative to the rejected one, and it was satisfied while the preferred response itself became
-less likely.
-
-## What the four results establish
-
-| Question | Result | Section |
-|---|---|---|
-| Is the trailing text false? | About a third of it, for SFT and DPO alike; DPO doubles the amount | 1 |
-| Does it come from the `over_complete` pairs? | No | Week 8, #24 |
-| Does it come from one half of the pairs? | No, either half reproduces it | 2 |
-| Does it come from the additional training steps? | No, the SFT objective for the same steps does not produce it | 3 |
-| What does the DPO objective change? | The probability of stopping after the first sentence, from 0.81 to 0.65 | 4 |
-
-The DPO stage leaves answer accuracy, refusals and partial handling where SFT had them. Its one
-measurable effect on this task is that the model stops less readily after a complete answer, and
-on a task where every statement must be supported by the evidence, the sentences that follow are
-where unsupported statements come from.
-
-## Limitations
-
-- **The held-out set is small, and one base model and one DPO configuration were used.** Each
-  number above is a count or a mean over 60 answerable rows and four seeds.
-- **The 12 models trained in this period were not judged.** Answer accuracy, refusals and
-  faithfulness are not measured for the subset models or the control, and their trailing text is
-  not labeled.
-- **Section 4 shows what the DPO objective changes, not why.** No experiment in this report
-  explains how the objective lowers the stop probability.
+This ablation shows what the DPO loss changes on this task. It does not show why the loss changes
+it.
 
 ## How to run
 
 ```bash
-# Section 1: build the items to label, then print the tables from the labels
+# Ablation 1: build the items, then print the tables from the labels
 python data/trailing_labels/build_trailing_items.py
 python data/trailing_labels/trailing_label_summary.py
 
-# Section 2, on branch ablation/dpo-pair-category: DPO on one subset of the pairs
+# Ablation 2, on branch ablation/dpo-pair-category: DPO on one half of the pairs
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train_answerable_only.jsonl \
   --train-config configs/train/dpo_answerable_only.yaml --sft-adapter checkpoints/<sft-run> --seed 44
 
-# Section 3, on branch ablation/sft-continued-control: the control
+# Ablation 3, on branch ablation/sft-continued-control: continued SFT
 python -m grounded_refusal.train.train_sft_continued --data data/preference_v3c_train.jsonl \
   --sft-adapter checkpoints/<sft-run> --seed 44
 
-# Section 4, on branch ablation/stop-probability: read the probabilities, then print the tables
+# Ablation 4, on branch ablation/stop-probability: read the probabilities, then print the tables
 python -m grounded_refusal.eval.stop_probability
 python -m grounded_refusal.eval.stop_probability_summary
 ```
 
-The counts of responses of two or more sentences in sections 2 and 3 come from one-off scripts
-that are not in the repository.
+The counts of responses with trailing text in Ablations 2 and 3, and the comparisons of responses
+between models, came from one-off scripts that are not in the repository.
 
-## Next
+## Next: Week 10
 
-- **Put the base model on the same table as the 16 models.** The base model's results are in
-  [Week 7](week7.md), scored against the `v2` held-out labels (58 answerable, 48 unanswerable, 14
-  partial rows). The 16 models are scored against the `v3b` labels (60, 41, 19). Scoring the base
-  model's responses against the `v3b` labels gives the comparison from no fine-tuning to SFT on
-  one set of labels.
-- **Does a length penalty in the DPO objective remove the trailing sentence?** DPO is known to
-  favor longer responses, and a regularized objective has been proposed for it (Park et al. 2024,
-  [arXiv:2403.19159](https://arxiv.org/abs/2403.19159)). If the penalty restores the stop
-  probability and leaves correctness unchanged, the finding moves from isolating the effect to
-  removing it.
-- **Where is the drop largest?** Week 8 also predicted that the stop probability falls most where
-  the evidence contains material the answer does not use. The 35 rows on which it falls by more
-  than 0.5 can be compared with the rest on that property.
+Score the base model against the same labels as the 16 models. Its results are in
+[Week 7](week7.md), scored against the `v2` held-out labels (58 answerable, 48 unanswerable, 14
+partial), while the 16 models are scored against the `v3b` labels (60, 41, 19), so the step from
+no fine-tuning to SFT is not yet on one table.
 
-## Appendix: per-seed values
+Train DPO with a length penalty on the loss and repeat Ablation 4 on it. DPO is known to favor
+longer responses, and a regularized loss has been proposed for it (Park et al. 2024,
+[arXiv:2403.19159](https://arxiv.org/abs/2403.19159)). If the penalty brings `stop_prob` back to
+the SFT level and leaves answer accuracy where it is, the result moves from isolating the effect
+to removing it.
 
-The values for each model, in the order of seeds 42, 44, 45, 46. All models are trained on `v3c`
-unless marked.
+Compare the 35 rows on which `stop_prob` falls by more than 0.5 with the rest. Week 8 expected the
+drop to be largest where the evidence contains material the answer does not use, as it does in
+`ex_0094`, and these rows can confirm or contradict that without any new run.
 
-| | SFT | Control | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
+## Appendix: per-seed values and the remaining tables of Ablation 4
+
+The values for each model, in the order of seeds 42, 44, 45, 46. All are trained on `v3c`.
+
+| | SFT | Continued SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
 |---|---|---|---|---|---|
-| Responses of two or more sentences, answerable rows, of 60 | 15, 11, 9, 13 | 14, 11, 8, 11 | 26, 22, 21, 19 | 23, 21, 17, 22 | 32, 22, 24, 19 |
-| Mean stop probability | 0.800, 0.823, 0.832, 0.782 | 0.807, 0.818, 0.834, 0.780 | 0.603, 0.707, 0.638, 0.649 | 0.653, 0.738, 0.703, 0.648 | 0.581, 0.703, 0.617, 0.646 |
-| Rows with stop probability below 0.5, of 60 | 9, 11, 9, 14 | 10, 11, 9, 13 | 23, 18, 21, 21 | 21, 15, 17, 21 | 24, 19, 21, 21 |
-| Mean log-probability per token of the reference response | -0.987, -0.979, -1.009, -0.999 | -0.996, -0.985, -1.007, -1.006 | -1.208, -1.176, -1.269, -1.295 | -1.169, -1.146, -1.214, -1.275 | -1.216, -1.177, -1.274, -1.300 |
+| Responses with trailing text, answerable rows, of 60 | 15, 11, 9, 13 | 14, 11, 8, 11 | 26, 22, 21, 19 | 23, 21, 17, 22 | 32, 22, 24, 19 |
+| Rows with `stop_prob` below 0.5, of 60 | 9, 11, 9, 14 | 10, 11, 9, 13 | 23, 18, 21, 21 | 21, 15, 17, 21 | 24, 19, 21, 21 |
+| Mean log-probability per token of `reference_answer` | -0.987, -0.979, -1.009, -0.999 | -0.996, -0.985, -1.007, -1.006 | -1.208, -1.176, -1.269, -1.295 | -1.169, -1.146, -1.214, -1.275 | -1.216, -1.177, -1.274, -1.300 |
 
-False trailing text per model, SFT and then DPO at the same data version and seed:
+`stop_prob` of each model against the SFT model of the same seed, row by row, over the 240 rows of
+the four seeds:
+
+| | Continued SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
+|---|---:|---:|---:|---:|
+| Rows where `stop_prob` is lower than SFT's | 116 | 239 | 236 | 239 |
+| Rows where it is lower by more than 0.5 | 0 | 35 | 24 | 38 |
+| Rows within 0.05 of SFT | 222 | 150 | 156 | 144 |
+
+`stop_prob` against the generated responses, over the same 240 rows:
+
+| | SFT | Continued SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
+|---|---:|---:|---:|---:|---:|
+| Rows with `stop_prob` below 0.5 | 43 | 43 | 83 | 74 | 85 |
+| Generated responses with trailing text | 48 | 44 | 88 | 83 | 97 |
+
+Mean log-probability per token of `reference_answer`, over the four seeds:
+
+| | SFT | Continued SFT | DPO, all 672 pairs | DPO, answerable only | DPO, unanswerable and partial only |
+|---|---:|---:|---:|---:|---:|
+| Mean log-probability per token | -0.99 | -1.00 | -1.24 | -1.20 | -1.24 |
+| Difference from the SFT model | | -0.01 | -0.24 | -0.21 | -0.25 |
+
+False trailing text per model in Ablation 1, SFT and then DPO at the same data version and seed:
 
 | | Seed 42 | Seed 44 | Seed 45 | Seed 46 |
 |---|---|---|---|---|
