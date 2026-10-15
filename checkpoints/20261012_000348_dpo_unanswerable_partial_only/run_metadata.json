@@ -1,0 +1,17 @@
+{
+  "base_model": "Qwen/Qwen2.5-3B-Instruct",
+  "sft_adapter": "checkpoints/20261009_181152_lora",
+  "trained_on": "data/preference_v3c_train_unanswerable_partial_only.jsonl",
+  "num_rows": 349,
+  "num_epochs": 3,
+  "seed": 45,
+  "beta": 0.1,
+  "lora_r": 16,
+  "lora_target_modules": [
+    "q_proj",
+    "v_proj"
+  ],
+  "train_config": "configs/train/dpo_unanswerable_partial_only.yaml",
+  "git_commit": "f167f35d8d5c0246adcc765849001117ea0e16c0",
+  "created_at": "2026-10-12T00:12:29"
+}
