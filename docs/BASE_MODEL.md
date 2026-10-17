@@ -1,33 +1,31 @@
-# The base model compared with SFT and DPO
+# The base model as a baseline for SFT and DPO
 
 ## Summary
 
-The base model, Qwen2.5-3B-Instruct without fine-tuning, is scored here on the same held-out rows
-and labels as the SFT and DPO models of [Week 8](reports/week8.md). It answers as accurately as
-either of them: 71 of the 79 answerable and partial rows are answered correctly, against 70.8 for
-SFT and 71.0 for DPO. What fine-tuning adds is the handling of questions the evidence does not fully
-answer. SFT raises the correct refusals of unanswerable rows from 31 to 39.3 of 41 and the correct
-partial answers from 9 to 18.8 of 19. It also lowers the hallucination rate from 0.218 to 0.087,
-with fewer unfaithful responses on every kind of row. DPO leaves these results unchanged except for
-the hallucination rate, which it raises to 0.125 through unsupported sentences added after correct
+This document adds the base model as a baseline to the results of the SFT and DPO models. With the
+baseline on the same table, fine-tuning turns out not to raise answer accuracy: the base model
+already answers 71 of the 79 answerable and partial rows correctly, against 70.8 for SFT and 71.0
+for DPO. What fine-tuning adds is the handling of questions the evidence does not fully answer. SFT
+raises the correct refusals of unanswerable rows from 31 to 39.3 of 41 and the correct partial
+answers from 9 to 18.8 of 19. It also lowers the hallucination rate from 0.218 to 0.087, with fewer
+unfaithful responses on every kind of row. DPO leaves these results unchanged except for the
+hallucination rate, which it raises to 0.125 through unsupported sentences added after correct
 answers.
 
-The base model also writes two or more sentences on 23 of the 60 answerable rows, about as often as
-the DPO models (22.0). The sentence DPO adds is nevertheless not a return to the base model. Three
-quarters of the increase from SFT to DPO falls on the 37 rows where the base model answers in a
-single sentence. The habits SFT removes from the base model, such as correcting the evidence from
-outside knowledge, do not come back under DPO. DPO's two typical phrasings never occur in the base
-model's responses. What DPO adds is a comment on the evidence after a complete answer, in wording
-learned in SFT, because DPO makes the model less likely to stop after the first sentence.
+The base model also writes two or more sentences on many answerable rows, but the sentence DPO adds
+does not come from it. The rows on which DPO writes more than SFT are mostly rows where the base
+model answers in one sentence. What SFT removes from the base model, such as corrections of the
+evidence from outside knowledge, does not return under DPO. And DPO's added sentences mostly comment
+on the evidence after a complete answer, in two fixed phrasings that the SFT models already use and
+the base model never does. DPO makes these phrasings frequent by making the model less likely to
+stop after the first sentence.
 
-## 1. Base, SFT and DPO on the held-out set
+## 1. The baseline added to the SFT and DPO results
 
-The held-out set is `data_v3b_heldout.jsonl`, 120 rows, of which 60 are answerable, 19 partial and
-41 unanswerable. The SFT and DPO models are the eight `v3c` models of Week 8, trained under seeds
-42, 44, 45 and 46. Each DPO model is trained from the SFT model of the same seed. Their columns are
-means over the four seeds, and the appendix gives the values of each model. The base model's
-responses are those of [Week 7](reports/week7.md), scored against the `v3b` labels as described at
-the end of this document. Metric definitions are in [`EVAL_METRICS.md`](EVAL_METRICS.md).
+The table adds a column for the base model to the results of the eight `v3c` SFT and DPO models of
+[Week 8](reports/week8.md), scored against the same `v3b` labels. The SFT and DPO columns are means
+over the four seeds, and the appendix gives the values of each model. The last section describes how
+the baseline was obtained. Metric definitions are in [`EVAL_METRICS.md`](EVAL_METRICS.md).
 
 | Metric | Base | SFT | DPO |
 |---|---:|---:|---:|
@@ -38,8 +36,8 @@ the end of this document. Metric definitions are in [`EVAL_METRICS.md`](EVAL_MET
 | `partial_match_rate` | 0.474 (9/19) | 0.987 | 0.987 |
 | `answer_accuracy` | 0.899 (71/79) | 0.896 | 0.899 |
 
-The table below gives the same results as numbers of rows, together with the answer outcomes of
-the 79 answerable and partial rows.
+The table below gives the same results as numbers of rows, together with the answer outcomes of the
+79 answerable and partial rows.
 
 | | Base | SFT | DPO |
 |---|---:|---:|---:|
@@ -89,12 +87,13 @@ sentence, and that sentence is false: the question asks nothing about a monitori
 | SFT | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. |
 | DPO | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned. |
 
-Week 8 counts such responses as responses to answerable rows with two or more sentences. By this
-count an SFT model writes 12.0 and a DPO model 22.0, and [Week 9](reports/week9.md) attributes the
-increase to the DPO loss. The base model writes 23. If DPO returned the model to the base model's
-behavior, its added sentences would fall on the rows where the base model writes more, they would
-restore what SFT removed, and they would be worded as the base model words them. This section tests
-each of the three in turn.
+Week 8 counts such responses as responses to answerable rows with two or more sentences: 12.0 per
+SFT model and 22.0 per DPO model, and [Week 9](reports/week9.md) traces the increase to the DPO
+loss. The base model also writes two or more sentences, on 23 rows, so the added sentence could in
+principle be the base model's behavior returning once DPO undoes part of SFT. If it were, DPO's
+longer responses would fall on the rows where the base model writes more, they would restore what
+SFT removed from the base model, and they would be worded as the base model words its own. The three
+subsections test each in turn.
 
 ### Where DPO adds sentences
 
@@ -135,12 +134,12 @@ model that SFT removes do not return.
 
 ### How DPO words the added sentences
 
-The sentences that SFT and DPO models add carry a kind label and a true or false label in
-[`TRAILING_LABELS.md`](TRAILING_LABELS.md); the base model's responses are not part of that labeled
-set. The last two rows count the responses whose added sentences contain each of the two phrasings
-most typical of DPO, for the base model as well.
+The sentences that SFT and DPO models add after the first carry a kind label and a true or false
+label in [`TRAILING_LABELS.md`](TRAILING_LABELS.md); the base model's responses are not part of that
+labeled set. The last two rows count, for all three models, the responses that contain each of the
+two phrasings most typical of DPO.
 
-| Added sentences, answerable rows | Base | SFT, 4 models | DPO, 4 models |
+| Responses with two or more sentences, answerable rows | Base | SFT, 4 models | DPO, 4 models |
 |---|---:|---:|---:|
 | A comment on the evidence or the question (`evidence_comment`) | – | 28 | 61 |
 | A continuation of the answer or the calculation (`answer`) | – | 8 | 14 |
@@ -150,18 +149,18 @@ most typical of DPO, for the base model as well.
 | Containing "The rest of the question / statement / sentence -- … -- isn't mentioned" | 0 | 2 | 14 |
 | Containing "The X figure belongs to the (unrelated) Y" | 0 | 2 | 11 |
 
-Of the 40 added sentences that DPO contributes, 33 are comments on the evidence or the question,
-and on the 37 rows where the base model writes one sentence, 36 of DPO's 42 are. The false ones rise
-from 21 to 35, or from 5.3 to 8.8 per model, in line with the rise of unfaithful responses on
-answerable rows from 5.0 to 8.3 in Section 1.
+DPO writes 40 more longer responses than SFT, and comments on the evidence or the question account
+for 33 of them (61 against 28). On the 37 rows where the base model answers in one sentence, 36 of
+DPO's 42 added sentences are such comments. The false ones rise from 21 to 35, or from 5.3 to 8.8
+per model, in line with the rise of unfaithful responses on answerable rows from 5.0 to 8.3 in
+Section 1.
 
-Most of these comments follow one of the two phrasings, as in "The rest of the question -- about
-the monitoring system triggering an alert -- isn't mentioned" and "The 600 figure belongs to the
+Most of these comments follow one of the two phrasings, as in "The rest of the question -- about the
+monitoring system triggering an alert -- isn't mentioned" and "The 600 figure belongs to the
 unrelated Precision Instruments". Neither occurs in the base model's responses, and no sentence a
 DPO model adds is identical to one of the base model's on the same row. The base model comments on
-the evidence in its own words, such as "The evidence does not mention …" and "However, …". Four of
-the DPO models' responses instead repeat an instruction embedded in the evidence, that "the 2022
-figure is outdated".
+the evidence in its own words, such as "The evidence does not mention …" and "However, …". Four DPO
+responses also repeat an instruction embedded in the evidence, that "the 2022 figure is outdated".
 
 ### Where the wording comes from
 
@@ -170,27 +169,34 @@ supply their wording: 92 of the 323 answerable targets contain the clause "the X
 …", and 34 of the 84 partial targets end with "… isn't stated". "The rest of the question" itself
 occurs nowhere in the training data, in neither the SFT targets nor the preference pairs, yet the
 SFT models write it twice. DPO does not teach the phrasing. It lowers the probability of stopping
-after the first sentence from 0.81 to 0.65 (Week 9, Ablation 4), and the model continues in the
+after the first sentence from 0.81 to 0.65 (Week 9, Ablation 4), and in training it lowers the
+end-of-turn token far more than any other token
+([#30](https://github.com/stxxllbu/grounded-refusal/pull/30)). The model then continues in the
 wording it already has: "The rest of the question" rises from 2 responses to 14. The phrasing does
-not depend on the partial preference pairs either, since DPO models trained only on answerable
-pairs still write it on 2 to 5 rows each (Week 9, Ablation 2).
+not depend on the partial preference pairs either, since DPO models trained only on answerable pairs
+still write it on 2 to 5 rows each (Week 9, Ablation 2).
 
-The counts of 23 and 22.0 are therefore close but describe different behaviors. The base model
-writes more where a calculation follows or where it comments on, corrects or doubts its own answer
-in its own words, and SFT keeps the calculations and part of the comments. DPO adds comments on the
-evidence after complete answers, mostly on rows where the base model stops after one sentence, in
-wording that SFT already had and DPO makes frequent.
+The sentence DPO adds therefore does not come from the base model. The base model writes more where
+a calculation follows, or where it comments on, corrects or doubts its answer in its own words, and
+SFT keeps the calculations and part of the comments. DPO adds comments on the evidence after
+complete answers, mostly on rows where the base model stops after one sentence, in wording that SFT
+already had and DPO makes frequent.
 
-## How the base results were obtained
+## How the baseline was obtained
+
+The held-out set is `data_v3b_heldout.jsonl`, 120 rows, of which 60 are answerable, 19 partial and
+41 unanswerable. The SFT and DPO models were trained under seeds 42, 44, 45 and 46, each DPO model
+from the SFT model of the same seed. The base model's responses are those of [Week
+7](reports/week7.md), where they were scored against the `v2` labels.
 
 The `v2` and `v3b` held-out files contain the same 120 rows with the same evidence and questions.
 Only the label and reference answer of 7 rows differ, all of them unanswerable in `v2`: 5 become
-partial and 2 become answerable in `v3b`. The base model's Week 7 responses are therefore joined by
-row id to the `v3b` labels, giving `base_v3b_heldout.jsonl`, rather than generated again. The
-behavior and faithfulness judge reads only the prompt and the response, so its Week 7 output is
-reused as well. The correctness judge, which reads the reference answer, is run with gpt-5-mini on
-the 79 answerable and partial rows. `run_eval --resume` then recomputes every metric against the
-`v3b` labels without further API calls.
+partial and 2 become answerable in `v3b`. The Week 7 responses are therefore joined by row id to the
+`v3b` labels, giving `base_v3b_heldout.jsonl`, rather than generated again. The behavior and
+faithfulness judge reads only the prompt and the response, so its Week 7 output is reused as well.
+The correctness judge, which reads the reference answer, is run with gpt-5-mini on the 79 answerable
+and partial rows. `run_eval --resume` then recomputes every metric against the `v3b` labels without
+further API calls.
 
 | Check | Result |
 |---|---|
