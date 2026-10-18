@@ -3,7 +3,7 @@
 ## Summary
 
 This document adds the base model as a baseline to the results of the SFT and DPO models. Both
-fine-tuned models clearly outperform it on the questions the evidence does not fully answer. Correct
+fine-tuned models clearly outperform it in refusals, partial answers and hallucination. Correct
 refusals of unanswerable rows rise from 31 to 39.3 of 41, correct partial answers from 9 to 18.8 of
 19, and the hallucination rate falls from 0.218 to 0.087 for SFT and to 0.125 for DPO. Both gains
 come without any loss of answer accuracy, which stays at about 71 of the 79 answerable and partial
@@ -151,10 +151,10 @@ all three models, the responses that use each phrasing.
 | Using "The rest of the question / statement / sentence -- … -- isn't mentioned" | 0 | 2 | 14 |
 | Using "The X figure belongs to the (unrelated) Y" | 0 | 2 | 11 |
 
-Comments on the evidence or the question account for 33 of the 40 longer responses DPO gives beyond
-SFT, and for 36 of DPO's 42 on the rows where the base model writes one sentence. The two phrasings
-read, for example, "The rest of the question -- about the monitoring system triggering an alert --
-isn't mentioned" and "The 600 figure belongs to the unrelated Precision Instruments". The base model
+Comments on the evidence or the question account for 33 of DPO's 40 additional longer responses, and
+for 36 of DPO's 42 on the rows where the base model writes one sentence. The two phrasings read, for
+example, "The rest of the question -- about the monitoring system triggering an alert -- isn't
+mentioned" and "The 600 figure belongs to the unrelated Precision Instruments". The base model
 instead comments in its own words, such as "The evidence does not mention …" and "However, …", and
 no sentence DPO adds repeats one of the base model's.
 
@@ -163,13 +163,11 @@ their wording, and the SFT models already use both. DPO makes the phrasings freq
 model less likely to stop after the first sentence: the stop probability falls from 0.81 to 0.65
 (stop-probability ablation, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27)), and in
 training DPO lowers the end-of-turn token far more than any other token (token-attribution ablation,
-[#30](https://github.com/stxxllbu/grounded-refusal/pull/30)). "The rest of the question" rises from
-2 responses to 14.
+[#30](https://github.com/stxxllbu/grounded-refusal/pull/30)).
 
 Taken together, the three comparisons show that the sentence DPO adds is not inherited from the base
 model. It appears on rows where the base model writes one sentence, it does not bring back what SFT
-removed, and its phrasings come from the SFT models. DPO makes them frequent by making the model
-less likely to stop after the first sentence.
+removed, and its phrasings come from the SFT models.
 
 ## How the baseline was obtained
 
