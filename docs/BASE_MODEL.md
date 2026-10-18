@@ -63,10 +63,17 @@ Both fine-tuned models cut unfaithful responses on every kind of row, from 19 to
 for DPO. The difference between the two lies on answerable rows (5.0 and 8.3), in correct answers
 followed by an extra sentence (`correct_but_unfaithful` 2.0 and 5.3), which Section 2 examines.
 
-## 2. The sentence DPO adds is not inherited from the base model
+## 2. The base model's longer responses
 
-On `ex_0094`, all three models give the same answer, and the DPO model continues with a second
-sentence:
+The base model often writes more than one sentence: its responses to 23 of the 60 answerable rows
+have two or more sentences. On `ex_0120`, which asks how many moons Saturn has, it answers:
+"According to the evidence, Saturn has exactly 5 times as many moons as Jupiter. The almanac states
+that Jupiter has 3 moons. Therefore, Saturn has 3 × 5 = 15 moons."
+
+This bears on an earlier result about DPO. DPO models often add a sentence after a correct answer:
+counted as responses to answerable rows with two or more sentences, they write 22.0 against 12.0 for
+SFT models (Week 8, Section 4), and [Week 9](reports/week9.md) traces the difference to the DPO
+loss. On `ex_0094`, all three models give the same answer, and only the DPO model adds a sentence:
 
 | Seed 46 | Response to `ex_0094` |
 |---|---|
@@ -74,13 +81,12 @@ sentence:
 | SFT | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. |
 | DPO | According to the evidence, water freezes at 10 degrees Celsius at standard atmospheric pressure. The rest of the question -- about the monitoring system triggering an alert -- isn't mentioned. |
 
-Week 8 (Section 4) counts these as responses to answerable rows with two or more sentences: 12.0 per
-SFT model and 22.0 per DPO model, and [Week 9](reports/week9.md) traces the difference to the DPO
-loss. Since the base model also writes more than one sentence on many answerable rows, the baseline
-can test whether the sentence comes from it. If it did, it would appear on the base model's rows,
-restore what SFT removed, and use the base model's wording. None of the three holds.
+The baseline makes it possible to check whether the sentence DPO adds is the base model's habit
+returning. If it were, it would appear on the base model's rows, restore what SFT removed from the
+base model, and use the base model's wording. The three subsections below test each of these, and
+none holds.
 
-### Where DPO adds sentences
+### Which rows have longer responses
 
 The table splits the 60 answerable rows by whether the base model writes two or more sentences.
 
@@ -90,12 +96,14 @@ The table splits the 60 answerable rows by whether the base model writes two or 
 | The other 37 rows (of 148) | 0 | 12 | 42 |
 | All 60 rows (of 240) | 23 | 48 | 88 |
 
-Of the 40 longer responses DPO adds to SFT's 48, 30 are on the 37 rows where the base model writes
-one sentence. Counted against the SFT model of the same seed, DPO writes 44 new longer responses, 31
-of them on these 37 rows. Only 13 fall on the base model's 23 rows, 30% of the 44, below the 38%
-those rows make up of the 60.
+On the 23 rows where the base model writes more than one sentence, the fine-tuned models often do as
+well: SFT in 36 of 92 responses and DPO in 46. On the 37 rows where the base model answers in one
+sentence, SFT rarely writes more (12 of 148), while DPO does so in 42, which accounts for 30 of the
+40 longer responses it writes beyond SFT. Compared response by response with the SFT model of the
+same seed, 13 of DPO's 44 additional longer responses (30%) fall on the base model's rows, below the
+38% those rows make up of the 60. DPO's longer responses therefore do not follow the base model's.
 
-### What SFT removes and DPO keeps removed
+### What the longer responses contain
 
 The base model's 23 longer responses fall into six kinds, with the rows of each in the appendix. The
 SFT and DPO columns count the longer responses of their four models on the rows of each kind.
@@ -113,7 +121,7 @@ SFT keeps the calculations (18 of 24) and removes the corrections from outside k
 pointers to the source and the restatements (8 responses to none). DPO keeps them removed: 3 of the
 32 possible responses.
 
-### How DPO words the added sentences
+### How the longer responses are worded
 
 Kind and truth labels come from [`TRAILING_LABELS.md`](TRAILING_LABELS.md), which does not cover the
 base model. The last two rows count, for all three models, the responses containing each of DPO's
