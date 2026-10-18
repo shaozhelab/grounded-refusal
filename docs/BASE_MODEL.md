@@ -158,22 +158,18 @@ isn't mentioned" and "The 600 figure belongs to the unrelated Precision Instrume
 instead comments in its own words, such as "The evidence does not mention …" and "However, …", and
 no sentence DPO adds repeats one of the base model's.
 
-### Where the wording comes from
+The two phrasings come from SFT rather than from the base model: the SFT training targets contain
+their wording, and the SFT models already use both. DPO makes the phrasings frequent by making the
+model less likely to stop after the first sentence: the stop probability falls from 0.81 to 0.65
+(stop-probability ablation, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27)), and in
+training DPO lowers the end-of-turn token far more than any other token (token-attribution ablation,
+[#30](https://github.com/stxxllbu/grounded-refusal/pull/30)). "The rest of the question" rises from
+2 responses to 14.
 
-In `data_v3c_train.jsonl`, 272 of the 323 answerable SFT targets are a single sentence. Both
-phrasings predate DPO: 92 of the answerable targets contain "the X figure belongs to …" and 34 of
-the 84 partial targets end with "… isn't stated". "The rest of the question" occurs in no training
-text, yet the SFT models write it twice. DPO lowers the probability of stopping after the first
-sentence from 0.81 to 0.65 (Week 9, Ablation 4), and in training it lowers the end-of-turn token far
-more than any other token ([#30](https://github.com/stxxllbu/grounded-refusal/pull/30)). The model
-then continues in the wording it already has: "The rest of the question" rises from 2 responses to
-14, and DPO trained on answerable pairs alone still writes it on 2 to 5 rows per model (Week 9,
-Ablation 2).
-
-The sentence DPO adds is therefore not inherited from the base model. It appears on rows where the
-base model writes one sentence, it does not bring back what SFT removed, and its phrasings come from
-the SFT models. DPO makes them frequent by making the model less likely to stop after the first
-sentence.
+Taken together, the three comparisons show that the sentence DPO adds is not inherited from the base
+model. It appears on rows where the base model writes one sentence, it does not bring back what SFT
+removed, and its phrasings come from the SFT models. DPO makes them frequent by making the model
+less likely to stop after the first sentence.
 
 ## How the baseline was obtained
 
