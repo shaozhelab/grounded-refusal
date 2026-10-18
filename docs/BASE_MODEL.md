@@ -88,27 +88,32 @@ none holds.
 
 ### Which rows have longer responses
 
-The table splits the 60 answerable rows by whether the base model writes two or more sentences.
+The table splits the 60 answerable rows by whether the base model writes two or more sentences and
+counts the longer responses of each model in each group. The SFT and DPO counts are summed over the
+four models of each, so each row contributes four responses to each of those columns.
 
-| Answerable rows | Base | SFT, 4 models | DPO, 4 models |
-|---|---:|---:|---:|
-| The base model's 23 rows (of 92 responses for SFT and DPO) | 23 | 36 | 46 |
-| The other 37 rows (of 148) | 0 | 12 | 42 |
-| All 60 rows (of 240) | 23 | 48 | 88 |
+| Answerable rows | Base, 1 model | SFT, 4 models | DPO, 4 models | Responses to which DPO adds a sentence, 4 models |
+|---|---:|---:|---:|---:|
+| The base model's 23 rows (of 92 responses for SFT and DPO) | 23 | 36 | 46 | 13 |
+| The other 37 rows (of 148) | 0 | 12 | 42 | 31 |
+| All 60 rows (of 240) | 23 | 48 | 88 | 44 |
 
-On the 23 rows where the base model writes more than one sentence, the fine-tuned models often do as
-well: SFT in 36 of 92 responses and DPO in 46. On the 37 rows where the base model answers in one
-sentence, SFT rarely writes more (12 of 148), while DPO does so in 42, which accounts for 30 of the
-40 longer responses it writes beyond SFT. Compared response by response with the SFT model of the
-same seed, 13 of DPO's 44 additional longer responses (30%) fall on the base model's rows, below the
-38% those rows make up of the 60. DPO's longer responses therefore do not follow the base model's.
+The rows on which DPO writes longer responses do not match those on which the base model does. DPO
+gives 40 more longer responses than SFT (88 against 48). Of these, 30 fall on the 37 rows where the
+base model answers in a single sentence (42 against SFT's 12), as on `ex_0094`, and only 10 on the
+base model's 23 rows (46 against SFT's 36).
+
+The last column counts the DPO responses that have two or more sentences where the SFT response of
+the same seed has one. Only 13 of these 44 (30%) are on the base model's 23 rows, although those
+rows make up 38% of the 60. DPO's added sentences are therefore mostly on rows where the base model
+writes one sentence.
 
 ### What the longer responses contain
 
 The base model's 23 longer responses fall into six kinds, with the rows of each in the appendix. The
 SFT and DPO columns count the longer responses of their four models on the rows of each kind.
 
-| Kind of text after the first sentence | Base | SFT | DPO | Example from the base model |
+| Kind of text after the first sentence | Base, 1 model | SFT, 4 models | DPO, 4 models | Example from the base model |
 |---|---:|---:|---:|---|
 | Reasoning or calculation: the first sentence states a relation, and the answer is computed after it | 6 | 18 of 24 | 20 of 24 | "The almanac states that Jupiter has 3 moons. Therefore, Saturn has 3 × 5 = 15 moons." (`ex_0120`) |
 | A comment on what the evidence mentions | 7 | 13 of 28 | 19 of 28 | "The evidence does not mention anything about it sitting on the Pacific coastline." (`ex_0098`) |
@@ -117,9 +122,9 @@ SFT and DPO columns count the longer responses of their four models on the rows 
 | A restatement of the answer | 2 | 0 of 8 | 0 of 8 | "Question: Who served as the first President of the United States? Answer: Thomas Jefferson." (`ex_0095`) |
 | Hesitation or self-contradiction after the answer | 2 | 5 of 8 | 4 of 8 | Having answered that Mozart lived to 90: "I do not have information about how old Mozart was when he died." (`ex_0351`) |
 
-SFT keeps the calculations (18 of 24) and removes the corrections from outside knowledge, the
-pointers to the source and the restatements (8 responses to none). DPO keeps them removed: 3 of the
-32 possible responses.
+SFT keeps the calculations (18 of the 24 responses of its four models) and removes the corrections
+from outside knowledge, the pointers to the source and the restatements (8 responses to none). DPO
+keeps them removed: 3 of the 32 possible responses.
 
 ### How the longer responses are worded
 
@@ -127,7 +132,7 @@ Kind and truth labels come from [`TRAILING_LABELS.md`](TRAILING_LABELS.md), whic
 base model. The last two rows count, for all three models, the responses containing each of DPO's
 two typical phrasings.
 
-| Responses with two or more sentences, answerable rows | Base | SFT, 4 models | DPO, 4 models |
+| Responses with two or more sentences, answerable rows | Base, 1 model | SFT, 4 models | DPO, 4 models |
 |---|---:|---:|---:|
 | A comment on the evidence or the question (`evidence_comment`) | – | 28 | 61 (69%) |
 | A continuation of the answer or the calculation (`answer`) | – | 8 | 14 (16%) |
