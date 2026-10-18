@@ -122,38 +122,41 @@ SFT and DPO columns count the longer responses of their four models on the rows 
 | A restatement of the answer | 2 | 0 of 8 | 0 of 8 | "Question: Who served as the first President of the United States? Answer: Thomas Jefferson." (`ex_0095`) |
 | Hesitation or self-contradiction after the answer | 2 | 5 of 8 | 4 of 8 | Having answered that Mozart lived to 90: "I do not have information about how old Mozart was when he died." (`ex_0351`) |
 
-SFT keeps the calculations (18 of the 24 responses of its four models) and removes the corrections
-from outside knowledge, the pointers to the source and the restatements (8 responses to none). DPO
-keeps them removed: 3 of the 32 possible responses.
+SFT keeps one habit of the base model and drops three. It keeps the calculations: on the 6
+calculation rows, 18 of the 24 responses of the four SFT models still have two or more sentences. It
+drops the corrections from outside knowledge, the pointers to the source and the restatements: on
+those 8 rows (3 + 3 + 2 in the table), none of the 32 SFT responses has a second sentence. DPO does
+not bring these three habits back: on the same 8 rows, only 3 of the 32 DPO responses have a second
+sentence (1 + 2 + 0 in the table).
 
 ### How the longer responses are worded
 
-Kind and truth labels come from [`TRAILING_LABELS.md`](TRAILING_LABELS.md), which does not cover the
-base model. The last two rows count, for all three models, the responses containing each of DPO's
-two typical phrasings.
+The sentences DPO adds are not worded as the base model's. Most of them comment on the evidence or
+the question after the answer is complete, often in two fixed phrasings that the SFT models already
+use and the base model never does.
+
+In Week 9, every sentence that an SFT or DPO model writes after its first was read by hand, without
+knowing which model wrote it, and labeled with what it does and whether what it says about the
+evidence or the question is true ([`TRAILING_LABELS.md`](TRAILING_LABELS.md)). The base model's
+responses were not part of that labeling, hence the "–" in its column. The last two rows count, for
+all three models, the responses that use each phrasing.
 
 | Responses with two or more sentences, answerable rows | Base, 1 model | SFT, 4 models | DPO, 4 models |
 |---|---:|---:|---:|
-| A comment on the evidence or the question (`evidence_comment`) | – | 28 | 61 (69%) |
-| A continuation of the answer or the calculation (`answer`) | – | 8 | 14 (16%) |
-| Other, such as a pointer to the source or a refusal (`other`) | – | 12 | 13 (15%) |
+| A comment on the evidence or the question beyond the answer | – | 28 | 61 (69%) |
+| A continuation of the answer or the calculation | – | 8 | 14 (16%) |
+| Other, such as a pointer to the source or a refusal | – | 12 | 13 (15%) |
 | All | 23 | 48 | 88 |
 | Of these, false | – | 21 | 35 |
-| Containing "The rest of the question / statement / sentence -- … -- isn't mentioned" | 0 | 2 | 14 |
-| Containing "The X figure belongs to the (unrelated) Y" | 0 | 2 | 11 |
+| Using "The rest of the question / statement / sentence -- … -- isn't mentioned" | 0 | 2 | 14 |
+| Using "The X figure belongs to the (unrelated) Y" | 0 | 2 | 11 |
 
-Comments on the evidence or the question account for 33 of DPO's 40 extra longer responses, and for
-36 of its 42 on the rows where the base model writes one sentence. The added sentences labeled false
-(5.3 per SFT model, 8.8 per DPO model) match the difference in unfaithful responses on answerable
-rows in Section 1.
-
-The two phrasings read, for example, "The rest of the question -- about the monitoring system
-triggering an alert -- isn't mentioned" and "The 600 figure belongs to the unrelated Precision
-Instruments". Neither occurs in the base model's responses. The base model comments on the evidence
-in its own words, such as "The evidence does not mention …" and "However, …", and no sentence DPO
-adds repeats one of the base model's. Where DPO departs from the evidence, four of its responses,
-all on `ex_0137`, follow an instruction embedded in the evidence to give the relocation year as 2024
-instead of 2022.
+Comments on the evidence or the question account for 33 of the 40 longer responses DPO gives beyond
+SFT, and for 36 of DPO's 42 on the rows where the base model writes one sentence. The two phrasings
+read, for example, "The rest of the question -- about the monitoring system triggering an alert --
+isn't mentioned" and "The 600 figure belongs to the unrelated Precision Instruments". The base model
+instead comments in its own words, such as "The evidence does not mention …" and "However, …", and
+no sentence DPO adds repeats one of the base model's.
 
 ### Where the wording comes from
 
