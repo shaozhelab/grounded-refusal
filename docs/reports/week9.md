@@ -31,10 +31,10 @@ Ablation 4 provides a direct criterion for evaluating it.
 | Item | Path | Notes |
 |------|------|-------|
 | Labels of the added sentences | [`data/trailing_labels/`](../../data/trailing_labels/), [`TRAILING_LABELS.md`](../TRAILING_LABELS.md) | 210 labeled items from the 16 models' held-out responses |
-| Ablation 1: DPO without the `over_complete` pairs | Branch `ablation/dpo-over-complete`, [#24](https://github.com/stxxllbu/grounded-refusal/pull/24) | Two subsets of `preference_v3c_train.jsonl`, 8 DPO adapters, both judges |
-| Ablation 2: DPO on half of the pairs | Branch `ablation/dpo-pair-category`, [#25](https://github.com/stxxllbu/grounded-refusal/pull/25) | Two subsets of `preference_v3c_train.jsonl`, two configurations, 8 DPO adapters |
-| Ablation 3: continued SFT | Branch `ablation/sft-continued-control`, [#26](https://github.com/stxxllbu/grounded-refusal/pull/26) | `train_sft_continued.py`, `sft_continued.yaml`, 4 adapters |
-| Ablation 4: stop probability | Branch `ablation/stop-probability`, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27) | `stop_probability.py`, `stop_probability_summary.py`, probabilities for 20 models |
+| Ablation 1: DPO without the `over_complete` pairs | Branch `ablation/dpo-over-complete`, [#24](https://github.com/shaozhelab/grounded-refusal/pull/24) | Two subsets of `preference_v3c_train.jsonl`, 8 DPO adapters, both judges |
+| Ablation 2: DPO on half of the pairs | Branch `ablation/dpo-pair-category`, [#25](https://github.com/shaozhelab/grounded-refusal/pull/25) | Two subsets of `preference_v3c_train.jsonl`, two configurations, 8 DPO adapters |
+| Ablation 3: continued SFT | Branch `ablation/sft-continued-control`, [#26](https://github.com/shaozhelab/grounded-refusal/pull/26) | `train_sft_continued.py`, `sft_continued.yaml`, 4 adapters |
+| Ablation 4: stop probability | Branch `ablation/stop-probability`, [#27](https://github.com/shaozhelab/grounded-refusal/pull/27) | `stop_probability.py`, `stop_probability_summary.py`, probabilities for 20 models |
 
 The four ablations are draft pull requests kept on their own branches, and `main` holds the label
 files. Adapter weights are not committed to git, consistent with

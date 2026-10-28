@@ -7,15 +7,15 @@ probability of stopping after the first sentence, and left open how the loss doe
 answers that question and removes the effect. LD-DPO, a DPO variant designed to remove length bias,
 leaves the added sentences unchanged (89 answerable responses with two or more sentences, against
 88 for DPO), so they do not come from the length of the responses
-([#29](https://github.com/stxxllbu/grounded-refusal/pull/29)). Splitting DPO's change to each
+([#29](https://github.com/shaozhelab/grounded-refusal/pull/29)). Splitting DPO's change to each
 response by token shows that it falls mostly on the EOS token of the rejected responses
-([#30](https://github.com/stxxllbu/grounded-refusal/pull/30)). Because every response ends with the
+([#30](https://github.com/shaozhelab/grounded-refusal/pull/30)). Because every response ends with the
 same EOS token, pushing it down in the rejected responses lowers it in all responses, and the model
 stops less often. REM-DPO, DPO with the rejected EOS token masked out of the loss, restores the
 probability of stopping after the first sentence from 0.65 to SFT's 0.81 and the responses with
 added sentences from 88 to SFT's 48. Its hallucination rate falls from 0.125 to 0.106, while
 refusals, partial answers and accuracy stay within about one row of SFT and DPO
-([#31](https://github.com/stxxllbu/grounded-refusal/pull/31)).
+([#31](https://github.com/shaozhelab/grounded-refusal/pull/31)).
 
 The week also adds the base model as a baseline. SFT and DPO clearly outperform it in refusals,
 partial answers and hallucination, without any loss of answer accuracy, and the sentence DPO adds is
@@ -25,10 +25,10 @@ not inherited from it ([`BASE_MODEL.md`](../BASE_MODEL.md)).
 
 | Work | What was added | Files | PR |
 |---|---|---|---|
-| Baseline | The base model scored against the `v3b` held-out labels | [`base_v3b_heldout.jsonl`](../../outputs/inference-qwen2.5-3b-instruct/base_v3b_heldout.jsonl) and its two judge outputs, [`BASE_MODEL.md`](../BASE_MODEL.md) | [#28](https://github.com/stxxllbu/grounded-refusal/pull/28) |
-| Ablation | LD-DPO at `ld_alpha` 0.5, 4 seeds | `configs/train/dpo_ld.yaml`, branch `ablation/dpo-length-desensitized` | [#29](https://github.com/stxxllbu/grounded-refusal/pull/29) |
-| Ablation | Per-token change in log-probability from SFT to DPO | `token_attribution.py`, `token_attribution_summary.py`, branch `ablation/token-attribution` | [#30](https://github.com/stxxllbu/grounded-refusal/pull/30) |
-| REM-DPO | DPO with the rejected EOS token masked out of the loss, 4 seeds, both judges | `MaskRejectedEndCollator` in `train_dpo.py`, `configs/train/dpo_mask_rejected_end.yaml`, branch `ablation/mask-rejected-end` | [#31](https://github.com/stxxllbu/grounded-refusal/pull/31) |
+| Baseline | The base model scored against the `v3b` held-out labels | [`base_v3b_heldout.jsonl`](../../outputs/inference-qwen2.5-3b-instruct/base_v3b_heldout.jsonl) and its two judge outputs, [`BASE_MODEL.md`](../BASE_MODEL.md) | [#28](https://github.com/shaozhelab/grounded-refusal/pull/28) |
+| Ablation | LD-DPO at `ld_alpha` 0.5, 4 seeds | `configs/train/dpo_ld.yaml`, branch `ablation/dpo-length-desensitized` | [#29](https://github.com/shaozhelab/grounded-refusal/pull/29) |
+| Ablation | Per-token change in log-probability from SFT to DPO | `token_attribution.py`, `token_attribution_summary.py`, branch `ablation/token-attribution` | [#30](https://github.com/shaozhelab/grounded-refusal/pull/30) |
+| REM-DPO | DPO with the rejected EOS token masked out of the loss, 4 seeds, both judges | `MaskRejectedEndCollator` in `train_dpo.py`, `configs/train/dpo_mask_rejected_end.yaml`, branch `ablation/mask-rejected-end` | [#31](https://github.com/shaozhelab/grounded-refusal/pull/31) |
 
 The ablations and REM-DPO are draft pull requests kept on their own branches. Adapter weights are not
 committed to git, consistent with [`checkpoints/README.md`](../../checkpoints/README.md).
@@ -59,7 +59,7 @@ smaller, but its responses do not change: it writes 89 answerable responses with
 sentences, against 88 for DPO and 48 for SFT, matches DPO at every seed, and 187 of its 240
 answerable responses are word for word those of DPO. The added sentences therefore do not come from
 DPO's sensitivity to length. Details are in
-[#29](https://github.com/stxxllbu/grounded-refusal/pull/29).
+[#29](https://github.com/shaozhelab/grounded-refusal/pull/29).
 
 ## 3. Ablation: the per-token change from SFT to DPO
 
@@ -75,7 +75,7 @@ is unchanged (−0.01) while the EOS token falls (−0.06 to −0.31), and on th
 answers the EOS token falls by 1.96 to 3.02 while the first token of a second sentence becomes more
 likely. Since every response ends with the same EOS token, the push on the rejected responses lowers
 the probability of stopping in all of them. Details are in
-[#30](https://github.com/stxxllbu/grounded-refusal/pull/30).
+[#30](https://github.com/shaozhelab/grounded-refusal/pull/30).
 
 ## 4. REM-DPO: masking the rejected EOS token
 
@@ -109,13 +109,13 @@ hallucination rate falls from 0.125 to 0.106, because the correct answers follow
 statement (`correct_but_unfaithful`) return from 5.3 to SFT's 2.0 per model. Refusals, partial
 answers and accuracy stay within about one row of SFT and DPO, and training still ranks the chosen
 response above the rejected one in nearly every pair. Details are in
-[#31](https://github.com/stxxllbu/grounded-refusal/pull/31).
+[#31](https://github.com/shaozhelab/grounded-refusal/pull/31).
 
 ## How to run
 
-Each pull request gives its own commands: [#29](https://github.com/stxxllbu/grounded-refusal/pull/29)
-for LD-DPO, [#30](https://github.com/stxxllbu/grounded-refusal/pull/30) for the per-token change and
-[#31](https://github.com/stxxllbu/grounded-refusal/pull/31) for REM-DPO.
+Each pull request gives its own commands: [#29](https://github.com/shaozhelab/grounded-refusal/pull/29)
+for LD-DPO, [#30](https://github.com/shaozhelab/grounded-refusal/pull/30) for the per-token change and
+[#31](https://github.com/shaozhelab/grounded-refusal/pull/31) for REM-DPO.
 [`BASE_MODEL.md`](../BASE_MODEL.md) gives the command for the baseline.
 
 ## Next: Week 11

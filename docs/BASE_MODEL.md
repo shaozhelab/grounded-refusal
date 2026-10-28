@@ -161,9 +161,9 @@ no sentence DPO adds repeats one of the base model's.
 The two phrasings come from SFT rather than from the base model: the SFT training targets contain
 their wording, and the SFT models already use both. DPO makes the phrasings frequent by making the
 model less likely to stop after the first sentence: the stop probability falls from 0.81 to 0.65
-(stop-probability ablation, [#27](https://github.com/stxxllbu/grounded-refusal/pull/27)), and in
+(stop-probability ablation, [#27](https://github.com/shaozhelab/grounded-refusal/pull/27)), and in
 training DPO lowers the end-of-turn token far more than any other token (token-attribution ablation,
-[#30](https://github.com/stxxllbu/grounded-refusal/pull/30)).
+[#30](https://github.com/shaozhelab/grounded-refusal/pull/30)).
 
 Taken together, the three comparisons show that the sentence DPO adds is not inherited from the base
 model. It appears on rows where the base model writes one sentence, it does not bring back what SFT
@@ -190,7 +190,7 @@ correctness judge, which reads the reference answer, is run on the 79 answerable
 
 | File | Contents |
 |---|---|
-| `outputs/inference-qwen2.5-3b-instruct/base_v3b_heldout.jsonl` | The base model's 120 held-out responses with the `v3b` labels ([#28](https://github.com/stxxllbu/grounded-refusal/pull/28)) |
+| `outputs/inference-qwen2.5-3b-instruct/base_v3b_heldout.jsonl` | The base model's 120 held-out responses with the `v3b` labels ([#28](https://github.com/shaozhelab/grounded-refusal/pull/28)) |
 | `outputs/eval-qwen2.5-3b-instruct/base_v3b_heldout_eval_judge-gpt5-mini.jsonl` | `predicted_behavior` and `is_faithful` for each response |
 | `outputs/eval-qwen2.5-3b-instruct/base_v3b_heldout_correctness_judge-gpt5-mini.jsonl` | `answer_match` for the 79 answerable and partial rows |
 

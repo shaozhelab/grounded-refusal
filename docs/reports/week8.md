@@ -28,11 +28,11 @@ cause of the added sentence is examined by four ablations in [Week 9](week9.md).
 
 | Work | What was added | Files | PR |
 |---|---|---|---|
-| Training data | `v3a`: 192 rows for the nine untrained question types | [`data_v3a_train.jsonl`](../../data/data_v3a_train.jsonl), [`preference_v3a_train.jsonl`](../../data/preference_v3a_train.jsonl) | [#17](https://github.com/stxxllbu/grounded-refusal/pull/17) |
-| Training data | `v3b`: 26 labels corrected | [`data_v3b_train.jsonl`](../../data/data_v3b_train.jsonl), [`data_v3b_heldout.jsonl`](../../data/data_v3b_heldout.jsonl), [`preference_v3b_train.jsonl`](../../data/preference_v3b_train.jsonl) | [#20](https://github.com/stxxllbu/grounded-refusal/pull/20) |
-| Training data | `v3c`: 18 corrected answers returned to a common wording | [`data_v3c_train.jsonl`](../../data/data_v3c_train.jsonl), [`preference_v3c_train.jsonl`](../../data/preference_v3c_train.jsonl) | [#21](https://github.com/stxxllbu/grounded-refusal/pull/21) |
-| Evaluation | Correctness judge, answer accuracy, answer outcomes | [`correctness.py`](../../src/grounded_refusal/eval/correctness.py), [`run_eval.py`](../../src/grounded_refusal/eval/run_eval.py), [`metrics.py`](../../src/grounded_refusal/eval/metrics.py), [`EVAL_METRICS.md`](../EVAL_METRICS.md) | [#22](https://github.com/stxxllbu/grounded-refusal/pull/22) |
-| Comparison | `--seed` for both training scripts; 12 models under seeds 44, 45, 46 | [`train_sft.py`](../../src/grounded_refusal/train/train_sft.py), [`train_dpo.py`](../../src/grounded_refusal/train/train_dpo.py), [`checkpoints/README.md`](../../checkpoints/README.md) | [#23](https://github.com/stxxllbu/grounded-refusal/pull/23) |
+| Training data | `v3a`: 192 rows for the nine untrained question types | [`data_v3a_train.jsonl`](../../data/data_v3a_train.jsonl), [`preference_v3a_train.jsonl`](../../data/preference_v3a_train.jsonl) | [#17](https://github.com/shaozhelab/grounded-refusal/pull/17) |
+| Training data | `v3b`: 26 labels corrected | [`data_v3b_train.jsonl`](../../data/data_v3b_train.jsonl), [`data_v3b_heldout.jsonl`](../../data/data_v3b_heldout.jsonl), [`preference_v3b_train.jsonl`](../../data/preference_v3b_train.jsonl) | [#20](https://github.com/shaozhelab/grounded-refusal/pull/20) |
+| Training data | `v3c`: 18 corrected answers returned to a common wording | [`data_v3c_train.jsonl`](../../data/data_v3c_train.jsonl), [`preference_v3c_train.jsonl`](../../data/preference_v3c_train.jsonl) | [#21](https://github.com/shaozhelab/grounded-refusal/pull/21) |
+| Evaluation | Correctness judge, answer accuracy, answer outcomes | [`correctness.py`](../../src/grounded_refusal/eval/correctness.py), [`run_eval.py`](../../src/grounded_refusal/eval/run_eval.py), [`metrics.py`](../../src/grounded_refusal/eval/metrics.py), [`EVAL_METRICS.md`](../EVAL_METRICS.md) | [#22](https://github.com/shaozhelab/grounded-refusal/pull/22) |
+| Comparison | `--seed` for both training scripts; 12 models under seeds 44, 45, 46 | [`train_sft.py`](../../src/grounded_refusal/train/train_sft.py), [`train_dpo.py`](../../src/grounded_refusal/train/train_dpo.py), [`checkpoints/README.md`](../../checkpoints/README.md) | [#23](https://github.com/shaozhelab/grounded-refusal/pull/23) |
 
 ## 1. Three corrections to the training data
 

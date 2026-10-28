@@ -110,7 +110,7 @@ The second situation is a question that asks two things. In `ex_0581`, the quest
 suggested foul play and whether a formal report has been filed. The pronoun makes the first part
 unanswerable, but the evidence answers the second part directly: no formal report has been filed.
 
-**The rule.** [Issue #15](https://github.com/stxxllbu/grounded-refusal/issues/15) checked all 121
+**The rule.** [Issue #15](https://github.com/shaozhelab/grounded-refusal/issues/15) checked all 121
 `coreference_ambiguity` rows in `data_v2.jsonl` against a rule for when a pronoun is ambiguous.
 
 - A pronoun is ambiguous only when it follows two parallel candidates and nothing in the text
@@ -120,7 +120,7 @@ unanswerable, but the evidence answers the second part directly: no formal repor
   continues the previous sentence's subject.
 - Gender is never inferred from a name.
 
-[Issue #18](https://github.com/stxxllbu/grounded-refusal/issues/18) added one more point. An
+[Issue #18](https://github.com/shaozhelab/grounded-refusal/issues/18) added one more point. An
 ambiguous pronoun makes only its own part of the question unanswerable. If the question also asks
 something the evidence answers, that part stays answerable.
 
@@ -133,8 +133,8 @@ rows in #18, the other two (`ex_0115` and `ex_0171`) cannot be answered in eithe
 
 | Rows | Old label | New label | Issue |
 |---|---|---|---|
-| `ex_0133`, `ex_0135`, `ex_0157` | `unanswerable` | `answerable` | [#15](https://github.com/stxxllbu/grounded-refusal/issues/15) |
-| `ex_0572` to `ex_0594` (23 rows) | `unanswerable` | `partial` | [#18](https://github.com/stxxllbu/grounded-refusal/issues/18) |
+| `ex_0133`, `ex_0135`, `ex_0157` | `unanswerable` | `answerable` | [#15](https://github.com/shaozhelab/grounded-refusal/issues/15) |
+| `ex_0572` to `ex_0594` (23 rows) | `unanswerable` | `partial` | [#18](https://github.com/shaozhelab/grounded-refusal/issues/18) |
 
 In the three rows relabeled `answerable`, the pronoun continues the previous sentence's subject. The
 answers are Northwood Capital, the prototype, and Grace Whitfield. These rows also lose the
