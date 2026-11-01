@@ -98,7 +98,7 @@ def write_checkpoint_metadata(
 
 def train_dpo_main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Train a LoRA DPO adapter on preference JSONL.")
-    parser.add_argument("--data", type=Path, default=Path("data/preference_v2_train.jsonl"))
+    parser.add_argument("--data", type=Path, default=Path("data/preference_v3c_train.jsonl"))
     parser.add_argument(
         "--sft-adapter",
         type=Path,

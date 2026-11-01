@@ -278,7 +278,7 @@ not a replacement for `v3b` as the current recipe.
 
 | Task | File |
 |---|---|
-| Train the current recipe | `data_v3b_train.jsonl` (SFT) / `preference_v3b_train.jsonl` (DPO) |
+| Train the current recipe | `data_v3c_train.jsonl` (SFT) / `preference_v3c_train.jsonl` (DPO) |
 | Evaluate a `v3b`-trained model | `data_v3b_heldout.jsonl` |
 | Run the `v3c` wording control | `data_v3c_train.jsonl` (SFT) / `preference_v3c_train.jsonl` (DPO), evaluated on `data_v3b_heldout.jsonl` |
 | Reproduce the `v3a` checkpoints | `data_v3a_train.jsonl` (SFT) / `preference_v3a_train.jsonl` (DPO) |

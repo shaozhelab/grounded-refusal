@@ -181,7 +181,8 @@ Everything from the repository root. Inference needs the GPU (about 1.5 minutes 
 
 ```bash
 # DPO training, from the SFT checkpoint
-python -m grounded_refusal.train.train_dpo --sft-adapter checkpoints/20260913_193703_lora
+python -m grounded_refusal.train.train_dpo --data data/preference_v2_train.jsonl \
+  --sft-adapter checkpoints/20260913_193703_lora
 
 # Inference on the held-out split: base, SFT, DPO (--adapter of a DPO checkpoint merges its SFT adapter itself)
 python -m grounded_refusal.inference.run_inference --data data/data_v2_heldout.jsonl \

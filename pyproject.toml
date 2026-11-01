@@ -25,7 +25,7 @@ train = [
     "transformers",
     "accelerate",
     "peft",
-    "trl",
+    "trl==1.10.0",
     "datasets",
 ]
 dev = [
