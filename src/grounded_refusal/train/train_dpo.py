@@ -66,19 +66,18 @@ class MaskRejectedEndCollator(DataCollatorForPreference):
     to 0 at the rejected response's end-of-turn token removes that token from both
     sums, so the loss cannot lower a rejected response by lowering its end-of-turn
     token. Chosen responses are unchanged. The collator stacks the chosen sequences
-    first and the rejected ones after them, so rejected example i is row
-    len(examples) + i.
+    first and the rejected ones after them, so the rejected sequences start at row
+    len(examples).
     """
 
     end_token_id: int | None = None
 
     def torch_call(self, examples: list[dict]) -> dict:
-        output = super().torch_call(examples)
-        for i, example in enumerate(examples):
-            rejected_ids = example["rejected_ids"]
-            end_index = len(rejected_ids) - 1 - rejected_ids[::-1].index(self.end_token_id)
-            output["completion_mask"][len(examples) + i, len(example["prompt_ids"]) + end_index] = 0
-        return output
+        batch = super().torch_call(examples)
+        first_rejected = len(examples)
+        is_end = batch["input_ids"][first_rejected:] == self.end_token_id
+        batch["completion_mask"][first_rejected:][is_end] = 0
+        return batch
 
 
 def load_merged_sft_model(model_name: str, sft_adapter_path: str):
