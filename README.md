@@ -63,7 +63,7 @@ mention the monitoring system.
 
 Each step below holds the starting checkpoint, data and optimizer budget fixed and changes one factor,
 and every result is replicated across four seeds. The ablations live on their own branches as draft
-pull requests; `main` is unaffected.
+pull requests, and REM-DPO is merged into `main`.
 
 | Step | Hypothesis tested | Result | Reference |
 |---|---|---|---|
@@ -140,12 +140,12 @@ preference pair's `rejected` response enacts one of 17 targeted failure modes, f
 | [`src/grounded_refusal/data/`](src/grounded_refusal/data/) | Schemas, paraphrasing, preference-pair construction, stratified splitting |
 | [`src/grounded_refusal/inference/`](src/grounded_refusal/inference/) | Base and adapter inference; DPO checkpoints merge their SFT adapter first |
 | [`src/grounded_refusal/eval/`](src/grounded_refusal/eval/) | Both judges, outcome derivation, metric aggregation |
-| [`src/grounded_refusal/train/`](src/grounded_refusal/train/) | LoRA SFT and DPO |
+| [`src/grounded_refusal/train/`](src/grounded_refusal/train/) | LoRA SFT, DPO and REM-DPO |
 | [`configs/`](configs/) | Model, prompt and training configurations |
 | [`data/`](data/) | All dataset versions and the labels of the added sentences |
 | [`outputs/`](outputs/) | Every inference output and judge verdict behind the reported numbers |
 | [`checkpoints/`](checkpoints/) | Per-run `run_metadata.json` and `trainer_state.json` (weights are not committed) |
-| `ablation/*` branches | The seven ablations, REM-DPO included, each with its code, configs and outputs |
+| `ablation/*` branches | The six ablations, each with its code, configs and outputs |
 
 ## Reproducing
 
@@ -158,7 +158,7 @@ python -m grounded_refusal.train.train_sft --data data/data_v3c_train.jsonl --se
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train.jsonl \
   --sft-adapter checkpoints/<sft-run> --seed 42
 
-# REM-DPO (branch ablation/mask-rejected-end)
+# REM-DPO
 python -m grounded_refusal.train.train_dpo --data data/preference_v3c_train.jsonl \
   --sft-adapter checkpoints/<sft-run> \
   --train-config configs/train/dpo_mask_rejected_end.yaml --seed 42

@@ -271,8 +271,8 @@ pairs listed. Every `chosen` equals its row's `reference_answer`, all 672 `promp
 from their rows, and every `negative_type` matches what `build_preference.py` would choose today.
 
 **A known cost.** `v3c` raises the number of training answers that follow this one form from 13 to
-31, which is the concentration issue #19 describes. `v3c` is a control for reading the `v3b` result,
-not a replacement for `v3b` as the current recipe.
+31, which is the concentration issue #19 describes. `v3c` is the final training data, used by
+every reported SFT, DPO and REM-DPO model.
 
 ## Quick answer: "which file do I use"
 
